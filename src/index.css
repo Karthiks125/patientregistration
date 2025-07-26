@@ -193,6 +193,14 @@
   .remove-item-btn {
     @apply w-4 h-4 text-primary-dark hover:text-destructive cursor-pointer;
   }
+
+  .compound-field {
+    @apply flex gap-3 items-center;
+  }
+
+  .compound-field .field-group {
+    @apply flex-1;
+  }
 }
 
 @layer utilities {

@@ -174,17 +174,63 @@ export const specialties = [
   "Infectious Disease Specialist"
 ];
 
+export const eyeLasers = [
+  "Laser Iridotomy",
+  "Photocoagulation",
+  "Selective Laser Trabeculoplasty",
+  "Laser Capsulotomy",
+  "Retinal Photocoagulation",
+  "YAG Laser Capsulotomy",
+  "Argon Laser Trabeculoplasty",
+  "Cyclophotocoagulation"
+];
+
+export const eyeInjuries = [
+  "Corneal Abrasion",
+  "Foreign Body",
+  "Chemical Burn",
+  "Hyphema",
+  "Orbital Fracture",
+  "Eyelid Laceration",
+  "Penetrating Injury",
+  "Blunt Trauma",
+  "Thermal Burn",
+  "Welding Flash"
+];
+
+export const regularMedications = [
+  "Ibuprofen",
+  "Acetaminophen",
+  "Metformin",
+  "Lipitor",
+  "Simvastatin",
+  "Aspirin",
+  "Lisinopril",
+  "Amlodipine",
+  "Metoprolol",
+  "Omeprazole",
+  "Levothyroxine",
+  "Warfarin",
+  "Clopidogrel",
+  "Ramipril"
+];
+
+export const regularConditions = [
+  "Diabetes",
+  "Hypertension", 
+  "Sleep Apnea",
+  "Stroke",
+  "Cancer",
+  "Prostate Issues",
+  "Malignant Hyperthermia",
+  "Autoimmune Disorders",
+  "Thyroid Disease",
+  "Kidney Disease"
+];
+
 export const drugAllergies = [
   "Penicillin",
   "Sulfa Drugs",
-  "Codeine",
-  "Morphine",
-  "ASA (Aspirin)",
-  "Ibuprofen",
-  "Latex",
-  "Iodine",
-  "Contrast Dye",
-  "Amoxicillin",
-  "Erythromycin",
-  "Tetracycline"
+  "Aspirin",
+  "Latex"
 ];

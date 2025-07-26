@@ -15,23 +15,38 @@ import { useToast } from '@/hooks/use-toast';
 import { MultiSelectField } from './MultiSelectField';
 import { AutocompleteField } from './AutocompleteField';
 import { ButtonGroup } from './ButtonGroup';
+import { CompoundDateSelector } from './CompoundDateSelector';
+import { MultiEntryField, type MultiEntryItem } from './MultiEntryField';
 import * as medicalData from '@/data/medicalData';
 
 const formSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  dateOfBirth: z.date({ required_error: 'Date of birth is required' }),
+  dateOfBirth: z.object({
+    year: z.number().optional(),
+    month: z.number().optional(), 
+    day: z.number().optional()
+  }).refine(data => data.year && data.month && data.day, {
+    message: 'Please select a complete date'
+  }),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().optional(),
+  phone: z.string().regex(/^\d{10}$/, 'Enter a valid 10-digit Canadian phone number without spaces or symbols.').optional().or(z.literal('')),
   optometrist: z.string().optional(),
   familyDoctor: z.string().optional(),
   specialists: z.array(z.string()).default([]),
   eyeDiseases: z.array(z.string()).default([]),
   contactLensHistory: z.string().default(''),
   eyeSurgeries: z.array(z.string()).default([]),
+  eyeLasers: z.array(z.string()).default([]),
+  eyeInjuries: z.array(z.string()).default([]),
   eyeDrops: z.array(z.string()).default([]),
-  systemicDiseases: z.array(z.string()).default([]),
-  medications: z.array(z.string()).default([]),
+  eyeMedications: z.array(z.object({
+    medicationName: z.string(),
+    dosage: z.string(),
+    affectedEye: z.string()
+  })).default([]),
+  regularMedications: z.array(z.string()).default([]),
+  regularConditions: z.array(z.string()).default([]),
   drugAllergies: z.array(z.string()).default([])
 });
 
@@ -46,6 +61,7 @@ export const MedicalIntakeForm: React.FC = () => {
     defaultValues: {
       firstName: '',
       lastName: '',
+      dateOfBirth: { year: undefined, month: undefined, day: undefined },
       email: '',
       phone: '',
       optometrist: '',
@@ -54,9 +70,12 @@ export const MedicalIntakeForm: React.FC = () => {
       eyeDiseases: [],
       contactLensHistory: '',
       eyeSurgeries: [],
+      eyeLasers: [],
+      eyeInjuries: [],
       eyeDrops: [],
-      systemicDiseases: [],
-      medications: [],
+      eyeMedications: [],
+      regularMedications: [],
+      regularConditions: [],
       drugAllergies: []
     }
   });
@@ -75,17 +94,12 @@ export const MedicalIntakeForm: React.FC = () => {
     {
       title: 'Eye History',
       icon: Eye,
-      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeDrops']
+      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries', 'eyeDrops']
     },
     {
-      title: 'Systemic Diseases',
-      icon: Heart,
-      fields: ['systemicDiseases']
-    },
-    {
-      title: 'Medications and Allergies',
+      title: 'Medications',
       icon: Pill,
-      fields: ['medications', 'drugAllergies']
+      fields: ['eyeMedications', 'regularMedications', 'regularConditions', 'drugAllergies']
     }
   ];
 
@@ -168,32 +182,12 @@ export const MedicalIntakeForm: React.FC = () => {
                   <CalendarIcon className="field-icon" />
                   Date of Birth <span className="required-indicator">*</span>
                 </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? format(field.value, "PPP") : "Pick a date"}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <FormControl>
+                  <CompoundDateSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -231,8 +225,8 @@ export const MedicalIntakeForm: React.FC = () => {
                   <Phone className="field-icon" />
                   Phone Number
                 </FormLabel>
-                <FormControl>
-                  <Input placeholder="(555) 123-4567" {...field} />
+                 <FormControl>
+                   <Input placeholder="e.g. 4165551234" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -251,13 +245,8 @@ export const MedicalIntakeForm: React.FC = () => {
                   <Stethoscope className="field-icon" />
                   Current Optometrist
                 </FormLabel>
-                <FormControl>
-                  <AutocompleteField
-                    options={medicalData.commonOptometrists}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    placeholder="Type to search optometrists..."
-                  />
+                 <FormControl>
+                   <Input placeholder="Enter optometrist name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -276,13 +265,8 @@ export const MedicalIntakeForm: React.FC = () => {
                   <Stethoscope className="field-icon" />
                   Family Doctor
                 </FormLabel>
-                <FormControl>
-                  <AutocompleteField
-                    options={medicalData.commonFamilyDoctors}
-                    value={field.value || ''}
-                    onChange={field.onChange}
-                    placeholder="Type to search family doctors..."
-                  />
+                 <FormControl>
+                   <Input placeholder="Enter family doctor name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -415,23 +399,23 @@ export const MedicalIntakeForm: React.FC = () => {
           />
         );
 
-      case 'systemicDiseases':
+      case 'eyeLasers':
         return (
           <FormField
             control={form.control}
-            name="systemicDiseases"
+            name="eyeLasers"
             render={({ field }) => (
               <FormItem className="field-wrapper fade-in">
                 <FormLabel className="field-label">
-                  <Heart className="field-icon" />
-                  Systemic Diseases
+                  <Eye className="field-icon" />
+                  Eye Lasers
                 </FormLabel>
                 <FormControl>
                   <MultiSelectField
-                    options={medicalData.systemicDiseases}
+                    options={medicalData.eyeLasers}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Type to search diseases..."
+                    placeholder="Type to search eye lasers..."
                   />
                 </FormControl>
                 <FormMessage />
@@ -440,23 +424,97 @@ export const MedicalIntakeForm: React.FC = () => {
           />
         );
 
-      case 'medications':
+      case 'eyeInjuries':
         return (
           <FormField
             control={form.control}
-            name="medications"
+            name="eyeInjuries"
+            render={({ field }) => (
+              <FormItem className="field-wrapper fade-in">
+                <FormLabel className="field-label">
+                  <Eye className="field-icon" />
+                  Eye Injuries
+                </FormLabel>
+                <FormControl>
+                  <MultiSelectField
+                    options={medicalData.eyeInjuries}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Type to search eye injuries..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'eyeMedications':
+        return (
+          <FormField
+            control={form.control}
+            name="eyeMedications"
             render={({ field }) => (
               <FormItem className="field-wrapper fade-in">
                 <FormLabel className="field-label">
                   <Pill className="field-icon" />
-                  Current Medications
+                  Eye Medications
+                </FormLabel>
+                <FormControl>
+                  <MultiEntryField
+                    value={field.value}
+                    onChange={field.onChange}
+                    medicationOptions={medicalData.eyeDrops}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'regularMedications':
+        return (
+          <FormField
+            control={form.control}
+            name="regularMedications"
+            render={({ field }) => (
+              <FormItem className="field-wrapper fade-in">
+                <FormLabel className="field-label">
+                  <Pill className="field-icon" />
+                  Regular Medications
                 </FormLabel>
                 <FormControl>
                   <MultiSelectField
-                    options={medicalData.medications}
+                    options={medicalData.regularMedications}
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Type to search medications..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        );
+
+      case 'regularConditions':
+        return (
+          <FormField
+            control={form.control}
+            name="regularConditions"
+            render={({ field }) => (
+              <FormItem className="field-wrapper fade-in">
+                <FormLabel className="field-label">
+                  <Heart className="field-icon" />
+                  Regular Medical Conditions
+                </FormLabel>
+                <FormControl>
+                  <MultiSelectField
+                    options={medicalData.regularConditions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Type to search conditions..."
                   />
                 </FormControl>
                 <FormMessage />
