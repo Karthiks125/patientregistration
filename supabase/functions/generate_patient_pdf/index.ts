@@ -203,7 +203,7 @@ const handler = async (req: Request): Promise<Response> => {
     // In production, you would use a PDF generation service
     
     // Send email using SendGrid
-    const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY');
+    const SENDGRID_API_KEY = Deno.env.get('172f74b37148990e996a75623fddd3cb15d6f7ff5bcf7bca71d66cdd45459f3a');
     if (!SENDGRID_API_KEY) {
       throw new Error('SendGrid API key not configured');
     }
