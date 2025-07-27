@@ -18,6 +18,7 @@ import { AutocompleteField } from './AutocompleteField';
 import { ButtonGroup } from './ButtonGroup';
 import { CompoundDateSelector } from './CompoundDateSelector';
 import { MultiEntryField, type MultiEntryItem } from './MultiEntryField';
+import { EnhancedMultiEntryField, type EnhancedEntryItem } from './EnhancedMultiEntryField';
 import * as medicalData from '@/data/medicalData';
 
 const formSchema = z.object({
@@ -37,8 +38,16 @@ const formSchema = z.object({
   specialists: z.array(z.string()).default([]),
   eyeDiseases: z.array(z.string()).default([]),
   contactLensHistory: z.string().default(''),
-  eyeSurgeries: z.array(z.string()).default([]),
-  eyeLasers: z.array(z.string()).default([]),
+  eyeSurgeries: z.array(z.object({
+    name: z.string().min(1, "Surgery name is required"),
+    eye: z.string().optional(),
+    doctor: z.string().optional()
+  })).default([]),
+  eyeLasers: z.array(z.object({
+    name: z.string().min(1, "Laser name is required"),
+    eye: z.string().optional(),
+    doctor: z.string().optional()
+  })).default([]),
   eyeInjuries: z.array(z.string()).default([]),
   eyeDrops: z.array(z.string()).default([]),
   eyeMedications: z.array(z.object({
@@ -437,13 +446,15 @@ export const MedicalIntakeForm: React.FC = () => {
                   <Eye className="field-icon" />
                   Past Eye Surgeries
                 </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.eyeSurgeries}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search eye surgeries..."
-                  />
+                 <FormControl>
+                   <EnhancedMultiEntryField
+                     options={medicalData.eyeSurgeries}
+                     value={field.value as EnhancedEntryItem[]}
+                     onChange={field.onChange}
+                     placeholder="Type to search eye surgeries..."
+                     showEyeSelection={true}
+                     showDoctorField={true}
+                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -487,13 +498,15 @@ export const MedicalIntakeForm: React.FC = () => {
                   <Eye className="field-icon" />
                   Eye Lasers
                 </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.eyeLasers}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search eye lasers..."
-                  />
+                 <FormControl>
+                   <EnhancedMultiEntryField
+                     options={medicalData.eyeLasers}
+                     value={field.value as EnhancedEntryItem[]}
+                     onChange={field.onChange}
+                     placeholder="Type to search eye lasers..."
+                     showEyeSelection={true}
+                     showDoctorField={true}
+                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>

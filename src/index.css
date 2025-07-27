@@ -154,7 +154,7 @@
   }
 
   .field-group {
-    @apply space-y-4;
+    @apply space-y-6; /* Enhanced spacing from 16px to 24px for better UX */
   }
 
   .field-wrapper {
