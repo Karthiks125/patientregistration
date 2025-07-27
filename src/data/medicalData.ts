@@ -197,31 +197,6 @@ export const drugAllergies = [
   "None / Not Applicable"
 ];
 
-export const commonOptometrists = [
-  "Dr. Sarah Johnson",
-  "Dr. Michael Chen",
-  "Dr. Emily Rodriguez",
-  "Dr. David Thompson",
-  "Dr. Jennifer Lee",
-  "Dr. Robert Miller",
-  "Dr. Lisa Wong",
-  "Dr. James Wilson",
-  "Dr. Amanda Taylor",
-  "Dr. Christopher Brown"
-];
-
-export const commonFamilyDoctors = [
-  "Dr. Patricia Smith",
-  "Dr. Mark Davis",
-  "Dr. Jessica Anderson",
-  "Dr. Kevin Liu",
-  "Dr. Rachel Green",
-  "Dr. Andrew Martinez",
-  "Dr. Stephanie Kim",
-  "Dr. Thomas White",
-  "Dr. Michelle Garcia",
-  "Dr. Daniel Singh"
-];
 
 export const eyeInjuries = [
   "Corneal Abrasion",
