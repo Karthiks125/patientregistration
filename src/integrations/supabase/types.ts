@@ -49,11 +49,14 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+          medical_conditions: Json | null
+          medications: Json | null
           optometrist: string | null
           phone: string | null
           regular_conditions: Json | null
           regular_medications: Json | null
           specialists: Json | null
+          specialists_with_doctors: Json | null
           updated_at: string
         }
         Insert: {
@@ -72,11 +75,14 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
+          medical_conditions?: Json | null
+          medications?: Json | null
           optometrist?: string | null
           phone?: string | null
           regular_conditions?: Json | null
           regular_medications?: Json | null
           specialists?: Json | null
+          specialists_with_doctors?: Json | null
           updated_at?: string
         }
         Update: {
@@ -95,11 +101,14 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
+          medical_conditions?: Json | null
+          medications?: Json | null
           optometrist?: string | null
           phone?: string | null
           regular_conditions?: Json | null
           regular_medications?: Json | null
           specialists?: Json | null
+          specialists_with_doctors?: Json | null
           updated_at?: string
         }
         Relationships: []

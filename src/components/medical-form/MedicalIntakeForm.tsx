@@ -1,94 +1,83 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { format } from 'date-fns';
-import { CalendarIcon, User, Mail, Phone, Stethoscope, Eye, Heart, Pill, AlertTriangle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-
-import { MultiSelectField } from './MultiSelectField';
-import { AutocompleteField } from './AutocompleteField';
-import { ButtonGroup } from './ButtonGroup';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { CompoundDateSelector } from './CompoundDateSelector';
+import { AutocompleteField } from './AutocompleteField';
+import { EnhancedMultiEntryField } from './EnhancedMultiEntryField';
+import { ClickableOptions } from './ClickableOptions';
+import { DrugAllergiesField } from './DrugAllergiesField';
+import { PhoneInput } from './PhoneInput';
+import { SpecialistField, SpecialistEntry } from './SpecialistField';
 import { MultiEntryField, type MultiEntryItem } from './MultiEntryField';
-import { EnhancedMultiEntryField, type EnhancedEntryItem } from './EnhancedMultiEntryField';
-import * as medicalData from '@/data/medicalData';
+import { ButtonGroup } from './ButtonGroup';
+import { User, Calendar, Mail, Stethoscope, Eye, Heart, Pill, AlertTriangle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { 
+  eyeSurgeryOptions, 
+  eyeLaserOptions, 
+  eyeDiseaseOptions, 
+  eyeMedicationOptions, 
+  medicationOptions, 
+  medicalConditionOptions,
+  specialistOptions,
+  eyeInjuryOptions,
+  commonOptometrists,
+  commonFamilyDoctors
+} from '@/data/medicalData';
 
-const formSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  dateOfBirth: z.object({
-    year: z.number().optional(),
-    month: z.number().optional(), 
-    day: z.number().optional()
-  }).refine(data => data.year && data.month && data.day, {
-    message: 'Please select a complete date'
-  }),
-  email: z.string().email('Please enter a valid email address'),
-  phone: z.string().regex(/^\d{10}$/, 'Enter a valid 10-digit Canadian phone number without spaces or symbols.').optional().or(z.literal('')),
-  optometrist: z.string().optional(),
-  familyDoctor: z.string().optional(),
-  specialists: z.array(z.string()).default([]),
-  eyeDiseases: z.array(z.string()).default([]),
-  contactLensHistory: z.string().default(''),
-  eyeSurgeries: z.array(z.object({
-    name: z.string().min(1, "Surgery name is required"),
-    eye: z.string().optional(),
-    doctor: z.string().optional()
-  })).default([]),
-  eyeLasers: z.array(z.object({
-    name: z.string().min(1, "Laser name is required"),
-    eye: z.string().optional(),
-    doctor: z.string().optional()
-  })).default([]),
-  eyeInjuries: z.array(z.string()).default([]),
-  eyeDrops: z.array(z.string()).default([]),
-  eyeMedications: z.array(z.object({
-    medicationName: z.string(),
-    dosage: z.string(),
-    affectedEye: z.string()
-  })).default([]),
-  regularMedications: z.array(z.string()).default([]),
-  regularConditions: z.array(z.string()).default([]),
-  drugAllergies: z.array(z.string()).default([])
-});
+interface FormData {
+  // Personal Information
+  firstName: string;
+  lastName: string;
+  dateOfBirth: {
+    day?: number;
+    month?: number;
+    year?: number;
+  };
+  email: string;
+  phone: string;
+  optometrist: string;
+  familyDoctor: string;
+  contactLensHistory: string;
 
-type FormData = z.infer<typeof formSchema>;
+  // Eye History Arrays  
+  specialistsWithDoctors: SpecialistEntry[];
+  eyeDiseases: string[];
+  eyeSurgeries: any[];
+  eyeLasers: any[];
+  eyeInjuries: string[];
+  eyeMedications: any[];
+  medications: string[];
+  medicalConditions: string[];
+  drugAllergies: string[];
+}
 
 export const MedicalIntakeForm: React.FC = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      dateOfBirth: { year: undefined, month: undefined, day: undefined },
-      email: '',
-      phone: '',
-      optometrist: '',
-      familyDoctor: '',
-      specialists: [],
-      eyeDiseases: [],
-      contactLensHistory: '',
-      eyeSurgeries: [],
-      eyeLasers: [],
-      eyeInjuries: [],
-      eyeDrops: [],
-      eyeMedications: [],
-      regularMedications: [],
-      regularConditions: [],
-      drugAllergies: []
-    }
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    dateOfBirth: { day: undefined, month: undefined, year: undefined },
+    email: '',
+    phone: '',
+    optometrist: '',
+    familyDoctor: '',
+    contactLensHistory: '',
+    specialistsWithDoctors: [],
+    eyeDiseases: [],
+    eyeSurgeries: [],
+    eyeLasers: [],
+    eyeInjuries: [],
+    eyeMedications: [],
+    medications: [],
+    medicalConditions: [],
+    drugAllergies: []
   });
 
   const sections = [
@@ -100,64 +89,101 @@ export const MedicalIntakeForm: React.FC = () => {
     {
       title: 'Healthcare Providers',
       icon: Stethoscope,
-      fields: ['optometrist', 'familyDoctor', 'specialists']
+      fields: ['optometrist', 'familyDoctor', 'specialistsWithDoctors']
+    },
+    {
+      title: 'Medical Conditions',
+      icon: Heart,
+      fields: ['medicalConditions']
+    },
+    {
+      title: 'Medications & Allergies',
+      icon: Pill,
+      fields: ['medications', 'eyeMedications', 'drugAllergies']
     },
     {
       title: 'Eye History',
       icon: Eye,
-      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries', 'eyeDrops']
-    },
-    {
-      title: 'Medications',
-      icon: Pill,
-      fields: ['eyeMedications', 'regularMedications', 'regularConditions', 'drugAllergies']
+      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries']
     }
   ];
 
+  const updateField = (field: keyof FormData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const nextSection = () => {
-    const currentFields = sections[currentSection].fields;
-    const hasErrors = currentFields.some(field => form.formState.errors[field as keyof FormData]);
-    
-    if (!hasErrors) {
-      setCurrentSection(prev => Math.min(prev + 1, sections.length - 1));
-    } else {
-      toast({
-        title: "Please fix errors before continuing",
-        variant: "destructive"
-      });
-    }
+    setCurrentSection(prev => Math.min(prev + 1, sections.length - 1));
   };
 
   const prevSection = () => {
     setCurrentSection(prev => Math.max(prev - 1, 0));
   };
 
-  const onSubmit = async (data: FormData) => {
+  const validateCurrentSection = () => {
+    const currentFields = sections[currentSection].fields;
+    let isValid = true;
+
+    if (currentSection === 0) {
+      if (!formData.firstName || !formData.lastName || !formData.email) {
+        isValid = false;
+      }
+      if (!formData.dateOfBirth.day || !formData.dateOfBirth.month || !formData.dateOfBirth.year) {
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  };
+
+  const handleNext = () => {
+    if (validateCurrentSection()) {
+      nextSection();
+    } else {
+      toast({
+        title: "Please fill in required fields",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const onSubmit = async () => {
+    if (!validateCurrentSection()) {
+      toast({
+        title: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      console.log('Form submitted:', data);
+      console.log('Form submitted:', formData);
 
       // Prepare data for database insert
       const dbData = {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        date_of_birth: data.dateOfBirth,
-        email: data.email,
-        phone: data.phone || null,
-        optometrist: data.optometrist || null,
-        family_doctor: data.familyDoctor || null,
-        specialists: data.specialists,
-        eye_diseases: data.eyeDiseases,
-        contact_lens_history: data.contactLensHistory || null,
-        eye_surgeries: data.eyeSurgeries,
-        eye_lasers: data.eyeLasers,
-        eye_injuries: data.eyeInjuries,
-        eye_drops: data.eyeDrops,
-        eye_medications: data.eyeMedications,
-        regular_medications: data.regularMedications,
-        regular_conditions: data.regularConditions,
-        drug_allergies: data.drugAllergies
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        date_of_birth: {
+          day: formData.dateOfBirth.day || 1,
+          month: formData.dateOfBirth.month || 1,
+          year: formData.dateOfBirth.year || 1990
+        },
+        email: formData.email,
+        phone: formData.phone || null,
+        optometrist: formData.optometrist || null,
+        family_doctor: formData.familyDoctor || null,
+        specialists_with_doctors: formData.specialistsWithDoctors as any,
+        eye_diseases: formData.eyeDiseases,
+        contact_lens_history: formData.contactLensHistory || null,
+        eye_surgeries: formData.eyeSurgeries,
+        eye_lasers: formData.eyeLasers,
+        eye_injuries: formData.eyeInjuries,
+        eye_medications: formData.eyeMedications,
+        medications: formData.medications,
+        medical_conditions: formData.medicalConditions,
+        drug_allergies: formData.drugAllergies
       };
 
       // Save to Supabase
@@ -178,14 +204,13 @@ export const MedicalIntakeForm: React.FC = () => {
       const { data: pdfResponse, error: pdfError } = await supabase.functions
         .invoke('generate_patient_pdf', {
           body: {
-            patientData: data,
-            emailTo: data.email
+            patientData: formData,
+            emailTo: formData.email
           }
         });
 
       if (pdfError) {
         console.error('Error generating PDF:', pdfError);
-        // Don't throw error here - data is saved, just PDF failed
         toast({
           title: "Registration saved successfully!",
           description: "However, there was an issue sending the confirmation email. Please contact us if you need a copy.",
@@ -200,7 +225,25 @@ export const MedicalIntakeForm: React.FC = () => {
       }
 
       // Reset form
-      form.reset();
+      setFormData({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: { day: undefined, month: undefined, year: undefined },
+        email: '',
+        phone: '',
+        optometrist: '',
+        familyDoctor: '',
+        contactLensHistory: '',
+        specialistsWithDoctors: [],
+        eyeDiseases: [],
+        eyeSurgeries: [],
+        eyeLasers: [],
+        eyeInjuries: [],
+        eyeMedications: [],
+        medications: [],
+        medicalConditions: [],
+        drugAllergies: []
+      });
       setCurrentSection(0);
 
     } catch (error) {
@@ -219,424 +262,253 @@ export const MedicalIntakeForm: React.FC = () => {
     switch (fieldName) {
       case 'firstName':
         return (
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <User className="field-icon" />
-                  First Name <span className="required-indicator">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your first name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <User className="field-icon" />
+              First Name <span className="required-indicator">*</span>
+            </Label>
+            <Input 
+              placeholder="Enter your first name" 
+              value={formData.firstName}
+              onChange={(e) => updateField('firstName', e.target.value)}
+            />
+          </div>
         );
 
       case 'lastName':
         return (
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <User className="field-icon" />
-                  Last Name <span className="required-indicator">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your last name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <User className="field-icon" />
+              Last Name <span className="required-indicator">*</span>
+            </Label>
+            <Input 
+              placeholder="Enter your last name" 
+              value={formData.lastName}
+              onChange={(e) => updateField('lastName', e.target.value)}
+            />
+          </div>
         );
 
       case 'dateOfBirth':
         return (
-          <FormField
-            control={form.control}
-            name="dateOfBirth"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <CalendarIcon className="field-icon" />
-                  Date of Birth <span className="required-indicator">*</span>
-                </FormLabel>
-                <FormControl>
-                  <CompoundDateSelector
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Calendar className="field-icon" />
+              Date of Birth <span className="required-indicator">*</span>
+            </Label>
+            <CompoundDateSelector
+              value={formData.dateOfBirth}
+              onChange={(value) => updateField('dateOfBirth', value)}
+            />
+          </div>
         );
 
       case 'email':
         return (
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Mail className="field-icon" />
-                  Email Address <span className="required-indicator">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="your.email@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Mail className="field-icon" />
+              Email Address <span className="required-indicator">*</span>
+            </Label>
+            <Input 
+              type="email" 
+              placeholder="your.email@example.com" 
+              value={formData.email}
+              onChange={(e) => updateField('email', e.target.value)}
+            />
+          </div>
         );
 
       case 'phone':
         return (
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Phone className="field-icon" />
-                  Phone Number
-                </FormLabel>
-                 <FormControl>
-                   <Input placeholder="e.g. 4165551234" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <PhoneInput
+              value={formData.phone}
+              onChange={(value) => updateField('phone', value)}
+            />
+          </div>
         );
 
       case 'optometrist':
         return (
-          <FormField
-            control={form.control}
-            name="optometrist"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Stethoscope className="field-icon" />
-                  Current Optometrist
-                </FormLabel>
-                 <FormControl>
-                   <Input placeholder="Enter optometrist name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Stethoscope className="field-icon" />
+              Current Optometrist
+            </Label>
+            <AutocompleteField
+              options={commonOptometrists}
+              value={formData.optometrist}
+              onChange={(value) => updateField('optometrist', value)}
+              placeholder="Enter optometrist name"
+            />
+          </div>
         );
 
       case 'familyDoctor':
         return (
-          <FormField
-            control={form.control}
-            name="familyDoctor"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Stethoscope className="field-icon" />
-                  Family Doctor
-                </FormLabel>
-                 <FormControl>
-                   <Input placeholder="Enter family doctor name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Stethoscope className="field-icon" />
+              Family Doctor
+            </Label>
+            <AutocompleteField
+              options={commonFamilyDoctors}
+              value={formData.familyDoctor}
+              onChange={(value) => updateField('familyDoctor', value)}
+              placeholder="Enter family doctor name"
+            />
+          </div>
         );
 
-      case 'specialists':
+      case 'specialistsWithDoctors':
         return (
-          <FormField
-            control={form.control}
-            name="specialists"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Stethoscope className="field-icon" />
-                  Other Specialists
-                </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.specialties}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search specialists..."
-                    allowCustom={true}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Stethoscope className="field-icon" />
+              Other Specialists
+            </Label>
+            <SpecialistField
+              specialistOptions={specialistOptions}
+              value={formData.specialistsWithDoctors}
+              onChange={(value) => updateField('specialistsWithDoctors', value)}
+            />
+          </div>
+        );
+
+      case 'medicalConditions':
+        return (
+          <div className="field-wrapper fade-in">
+            <ClickableOptions
+              options={medicalConditionOptions}
+              value={formData.medicalConditions}
+              onChange={(value) => updateField('medicalConditions', value)}
+              label="Medical Conditions"
+              allowOther={true}
+            />
+          </div>
+        );
+
+      case 'medications':
+        return (
+          <div className="field-wrapper fade-in">
+            <ClickableOptions
+              options={medicationOptions}
+              value={formData.medications}
+              onChange={(value) => updateField('medications', value)}
+              label="Medications"
+              allowOther={true}
+            />
+          </div>
         );
 
       case 'eyeDiseases':
         return (
-          <FormField
-            control={form.control}
-            name="eyeDiseases"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Eye className="field-icon" />
-                  Eye Diseases
-                </FormLabel>
-                <FormControl>
-                   <MultiSelectField
-                     options={medicalData.eyeDisorders}
-                     value={field.value}
-                     onChange={field.onChange}
-                     placeholder="Type to search eye diseases..."
-                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Eye className="field-icon" />
+              Eye Diseases
+            </Label>
+            <AutocompleteField
+              options={eyeDiseaseOptions}
+              value={formData.eyeDiseases.join(', ')}
+              onChange={(value) => updateField('eyeDiseases', value ? value.split(', ').filter(v => v.trim()) : [])}
+              placeholder="Type to search eye diseases..."
+            />
+          </div>
         );
 
       case 'contactLensHistory':
         return (
-          <FormField
-            control={form.control}
-            name="contactLensHistory"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Eye className="field-icon" />
-                  Contact Lens History
-                </FormLabel>
-                <FormControl>
-                  <ButtonGroup
-                    options={['Yes', 'No', 'Sometimes']}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Eye className="field-icon" />
+              Contact Lens History
+            </Label>
+            <ButtonGroup
+              options={['Yes', 'No', 'Sometimes']}
+              value={formData.contactLensHistory}
+              onChange={(value) => updateField('contactLensHistory', value)}
+            />
+          </div>
         );
 
       case 'eyeSurgeries':
         return (
-          <FormField
-            control={form.control}
-            name="eyeSurgeries"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Eye className="field-icon" />
-                  Past Eye Surgeries
-                </FormLabel>
-                 <FormControl>
-                   <EnhancedMultiEntryField
-                     options={medicalData.eyeSurgeries}
-                     value={field.value as EnhancedEntryItem[]}
-                     onChange={field.onChange}
-                     placeholder="Type to search eye surgeries..."
-                     showEyeSelection={true}
-                     showDoctorField={true}
-                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-
-      case 'eyeDrops':
-        return (
-          <FormField
-            control={form.control}
-            name="eyeDrops"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Pill className="field-icon" />
-                  Eye Drops
-                </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.eyeDrops}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search eye drops..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Eye className="field-icon" />
+              Past Eye Surgeries
+            </Label>
+            <EnhancedMultiEntryField
+              options={eyeSurgeryOptions}
+              value={formData.eyeSurgeries}
+              onChange={(value) => updateField('eyeSurgeries', value)}
+              placeholder="Type to search eye surgeries..."
+              showEyeSelection={true}
+              showDoctorField={true}
+            />
+          </div>
         );
 
       case 'eyeLasers':
         return (
-          <FormField
-            control={form.control}
-            name="eyeLasers"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Eye className="field-icon" />
-                  Eye Lasers
-                </FormLabel>
-                 <FormControl>
-                   <EnhancedMultiEntryField
-                     options={medicalData.eyeLasers}
-                     value={field.value as EnhancedEntryItem[]}
-                     onChange={field.onChange}
-                     placeholder="Type to search eye lasers..."
-                     showEyeSelection={true}
-                     showDoctorField={true}
-                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Eye className="field-icon" />
+              Eye Lasers
+            </Label>
+            <EnhancedMultiEntryField
+              options={eyeLaserOptions}
+              value={formData.eyeLasers}
+              onChange={(value) => updateField('eyeLasers', value)}
+              placeholder="Type to search eye lasers..."
+              showEyeSelection={true}
+              showDoctorField={true}
+            />
+          </div>
         );
 
       case 'eyeInjuries':
         return (
-          <FormField
-            control={form.control}
-            name="eyeInjuries"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Eye className="field-icon" />
-                  Eye Injuries
-                </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.eyeInjuries}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search eye injuries..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Eye className="field-icon" />
+              Eye Injuries
+            </Label>
+            <AutocompleteField
+              options={eyeInjuryOptions}
+              value={formData.eyeInjuries.join(', ')}
+              onChange={(value) => updateField('eyeInjuries', value ? value.split(', ').filter(v => v.trim()) : [])}
+              placeholder="Type to search eye injuries..."
+            />
+          </div>
         );
 
       case 'eyeMedications':
         return (
-          <FormField
-            control={form.control}
-            name="eyeMedications"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Pill className="field-icon" />
-                  Eye Medications
-                </FormLabel>
-                <FormControl>
-                  <MultiEntryField
-                    value={field.value}
-                    onChange={field.onChange}
-                    medicationOptions={medicalData.eyeDrops}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-
-      case 'regularMedications':
-        return (
-          <FormField
-            control={form.control}
-            name="regularMedications"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Pill className="field-icon" />
-                  Regular Medications
-                </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.regularMedications}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search medications..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        );
-
-      case 'regularConditions':
-        return (
-          <FormField
-            control={form.control}
-            name="regularConditions"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <Heart className="field-icon" />
-                  Regular Medical Conditions
-                </FormLabel>
-                <FormControl>
-                   <MultiSelectField
-                     options={medicalData.medicalConditions}
-                     value={field.value}
-                     onChange={field.onChange}
-                     placeholder="Type to search conditions..."
-                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Pill className="field-icon" />
+              Eye Medications
+            </Label>
+            <MultiEntryField
+              value={formData.eyeMedications}
+              onChange={(value) => updateField('eyeMedications', value)}
+              medicationOptions={eyeMedicationOptions}
+            />
+          </div>
         );
 
       case 'drugAllergies':
         return (
-          <FormField
-            control={form.control}
-            name="drugAllergies"
-            render={({ field }) => (
-              <FormItem className="field-wrapper fade-in">
-                <FormLabel className="field-label">
-                  <AlertTriangle className="field-icon" />
-                  Drug Allergies
-                </FormLabel>
-                <FormControl>
-                  <MultiSelectField
-                    options={medicalData.drugAllergies}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search drug allergies..."
-                    allowCustom={true}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="field-wrapper fade-in">
+            <DrugAllergiesField
+              value={formData.drugAllergies}
+              onChange={(value) => updateField('drugAllergies', value)}
+            />
+          </div>
         );
 
       default:
@@ -664,57 +536,52 @@ export const MedicalIntakeForm: React.FC = () => {
           {sections.map((_, index) => (
             <div
               key={index}
-              className={cn(
-                "w-3 h-3 rounded-full transition-colors",
+              className={`w-3 h-3 rounded-full transition-colors ${
                 index <= currentSection ? "bg-primary" : "bg-muted"
-              )}
+              }`}
             />
           ))}
         </div>
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Current Section */}
-          <div className="form-section slide-in">
-            <div className="form-section-header">
-              <IconComponent className="section-icon" />
-              <h2 className="form-section-title">{currentSectionData.title}</h2>
-            </div>
+      {/* Current Section */}
+      <div className="form-section slide-in">
+        <div className="form-section-header">
+          <IconComponent className="section-icon" />
+          <h2 className="form-section-title">{currentSectionData.title}</h2>
+        </div>
 
-            <div className="field-group">
-              {currentSectionData.fields.map(fieldName => (
-                <div key={fieldName}>
-                  {renderField(fieldName)}
-                </div>
-              ))}
+        <div className="field-group">
+          {currentSectionData.fields.map(fieldName => (
+            <div key={fieldName}>
+              {renderField(fieldName)}
             </div>
+          ))}
+        </div>
 
-            {/* Navigation buttons */}
-            <div className="flex justify-between pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={prevSection}
-                disabled={currentSection === 0}
-                className="slide-in"
-              >
-                Previous
-              </Button>
+        {/* Navigation buttons */}
+        <div className="flex justify-between pt-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={prevSection}
+            disabled={currentSection === 0}
+            className="slide-in"
+          >
+            Previous
+          </Button>
 
-              {currentSection === sections.length - 1 ? (
-                <Button type="submit" className="slide-in" disabled={isSubmitting}>
-                  {isSubmitting ? 'Submitting...' : 'Submit Form'}
-                </Button>
-              ) : (
-                <Button type="button" onClick={nextSection} className="slide-in">
-                  Next
-                </Button>
-              )}
-            </div>
-          </div>
-        </form>
-      </Form>
+          {currentSection === sections.length - 1 ? (
+            <Button onClick={onSubmit} className="slide-in" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Form'}
+            </Button>
+          ) : (
+            <Button type="button" onClick={handleNext} className="slide-in">
+              Next
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

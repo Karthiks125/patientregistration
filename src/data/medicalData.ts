@@ -223,24 +223,6 @@ export const commonFamilyDoctors = [
   "Dr. Daniel Singh"
 ];
 
-export const specialties = [
-  "Endocrinologist",
-  "Neurologist", 
-  "Cardiologist",
-  "Rheumatologist",
-  "Oncologist",
-  "Dermatologist",
-  "Orthopedist",
-  "Psychiatrist",
-  "Pulmonologist",
-  "Gastroenterologist",
-  "Nephrologist",
-  "Urologist",
-  "Otolaryngologist (ENT)",
-  "Hematologist",
-  "Infectious Disease Specialist"
-];
-
 export const eyeInjuries = [
   "Corneal Abrasion",
   "Foreign Body",
@@ -255,6 +237,34 @@ export const eyeInjuries = [
   "Other Injury",
   "None / Not Applicable"
 ];
+
+export const specialistOptions = [
+  "Endocrinologist",
+  "Neurologist", 
+  "Cardiologist",
+  "Rheumatologist",
+  "Oncologist",
+  "Dermatologist",
+  "Orthopedist",
+  "Psychiatrist",
+  "Pulmonologist",
+  "Gastroenterologist",
+  "Nephrologist",
+  "Urologist",
+  "Otolaryngologist (ENT)",
+  "Hematologist",
+  "Infectious Disease Specialist",
+  "Other"
+];
+
+// Rename for clarity
+export const eyeSurgeryOptions = eyeSurgeries;
+export const eyeLaserOptions = eyeLasers;
+export const eyeDiseaseOptions = eyeDisorders;
+export const eyeMedicationOptions = eyeDrops;
+export const medicationOptions = regularMedications;
+export const medicalConditionOptions = medicalConditions;
+export const eyeInjuryOptions = eyeInjuries;
 
 // Dosage frequency options for medications
 export const dosageFrequencies = [
