@@ -27,6 +27,8 @@ export const SpecialistField: React.FC<SpecialistFieldProps> = ({
     specialist: '',
     doctorName: ''
   });
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customValue, setCustomValue] = useState('');
 
   const addEntry = () => {
     if (currentEntry.specialist.trim()) {
@@ -64,34 +66,86 @@ export const SpecialistField: React.FC<SpecialistFieldProps> = ({
       )}
 
       {/* Add new entry */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-        <div>
-          <SideAutocompleteField
-            options={specialistOptions}
-            value={currentEntry.specialist}
-            onChange={(specialist) => setCurrentEntry(prev => ({ ...prev, specialist }))}
-            placeholder="Specialist type"
-          />
-        </div>
+      <div className="space-y-3">
+        {!showCustomInput ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+            <div>
+              <SideAutocompleteField
+                options={[...specialistOptions, "Other"]}
+                value={currentEntry.specialist}
+                onChange={(specialist) => {
+                  if (specialist === "Other") {
+                    setShowCustomInput(true);
+                    setCurrentEntry(prev => ({ ...prev, specialist: '' }));
+                  } else {
+                    setCurrentEntry(prev => ({ ...prev, specialist }));
+                  }
+                }}
+                placeholder="Specialist type"
+              />
+            </div>
 
-        <div>
-          <Input
-            type="text"
-            value={currentEntry.doctorName || ''}
-            onChange={(e) => setCurrentEntry(prev => ({ ...prev, doctorName: e.target.value }))}
-            placeholder="Doctor's name (optional)"
-          />
-        </div>
+            {currentEntry.specialist && currentEntry.specialist !== "Other" && (
+              <div>
+                <Input
+                  type="text"
+                  value={currentEntry.doctorName || ''}
+                  onChange={(e) => setCurrentEntry(prev => ({ ...prev, doctorName: e.target.value }))}
+                  placeholder="Doctor's name (optional)"
+                />
+              </div>
+            )}
 
-        <Button 
-          type="button"
-          variant="outline" 
-          size="sm"
-          onClick={addEntry}
-          disabled={!currentEntry.specialist.trim()}
-        >
-          <Plus className="w-4 h-4" />
-        </Button>
+            <Button 
+              type="button"
+              variant="outline" 
+              size="sm"
+              onClick={addEntry}
+              disabled={!currentEntry.specialist.trim()}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Input
+              value={customValue}
+              onChange={(e) => setCustomValue(e.target.value)}
+              placeholder="Enter custom specialist type..."
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button 
+                type="button"
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  if (customValue.trim()) {
+                    setCurrentEntry(prev => ({ ...prev, specialist: customValue.trim() }));
+                    setCustomValue('');
+                    setShowCustomInput(false);
+                  }
+                }}
+                disabled={!customValue.trim()}
+                className="flex-1"
+              >
+                Add
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setShowCustomInput(false);
+                  setCustomValue('');
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

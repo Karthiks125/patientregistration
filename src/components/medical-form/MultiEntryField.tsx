@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SideAutocompleteField } from './SideAutocompleteField';
 import { Plus, X } from 'lucide-react';
@@ -29,6 +30,8 @@ export const MultiEntryField: React.FC<MultiEntryFieldProps> = ({
     dosage: '',
     affectedEye: ''
   });
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customValue, setCustomValue] = useState('');
 
   const dosageOptions = [
     "Once daily",
@@ -70,61 +73,115 @@ export const MultiEntryField: React.FC<MultiEntryFieldProps> = ({
       )}
 
       {/* Add new entry */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-        <div className="md:col-span-1">
-          <SideAutocompleteField
-            options={medicationOptions}
-            value={currentEntry.medicationName}
-            onChange={(medicationName) => setCurrentEntry(prev => ({ ...prev, medicationName }))}
-            placeholder="Medication name"
-          />
-        </div>
+      <div className="space-y-3">
+        {!showCustomInput ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+            <div className="md:col-span-1">
+              <SideAutocompleteField
+                options={[...medicationOptions, "Other"]}
+                value={currentEntry.medicationName}
+                onChange={(medicationName) => {
+                  if (medicationName === "Other") {
+                    setShowCustomInput(true);
+                    setCurrentEntry(prev => ({ ...prev, medicationName: '' }));
+                  } else {
+                    setCurrentEntry(prev => ({ ...prev, medicationName }));
+                  }
+                }}
+                placeholder="Medication name"
+              />
+            </div>
 
-        <div>
-          <Select 
-            value={currentEntry.dosage} 
-            onValueChange={(dosage) => setCurrentEntry(prev => ({ ...prev, dosage }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Dosage frequency" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
-              {dosageOptions.map(option => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            {currentEntry.medicationName && currentEntry.medicationName !== "Other" && (
+              <>
+                <div>
+                  <Select 
+                    value={currentEntry.dosage} 
+                    onValueChange={(dosage) => setCurrentEntry(prev => ({ ...prev, dosage }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Dosage frequency" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {dosageOptions.map(option => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-        <div>
-          <Select 
-            value={currentEntry.affectedEye} 
-            onValueChange={(affectedEye) => setCurrentEntry(prev => ({ ...prev, affectedEye }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Affected eye(s)" />
-            </SelectTrigger>
-            <SelectContent>
-              {eyeOptions.map(option => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+                <div>
+                  <Select 
+                    value={currentEntry.affectedEye} 
+                    onValueChange={(affectedEye) => setCurrentEntry(prev => ({ ...prev, affectedEye }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Affected eye(s)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eyeOptions.map(option => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
 
-        <Button 
-          type="button"
-          variant="outline" 
-          size="sm"
-          onClick={addEntry}
-          disabled={!currentEntry.medicationName || !currentEntry.dosage || !currentEntry.affectedEye}
-        >
-          <Plus className="w-4 h-4" />
-        </Button>
+            <Button 
+              type="button"
+              variant="outline" 
+              size="sm"
+              onClick={addEntry}
+              disabled={!currentEntry.medicationName || !currentEntry.dosage || !currentEntry.affectedEye}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Input
+              value={customValue}
+              onChange={(e) => setCustomValue(e.target.value)}
+              placeholder="Enter custom medication name..."
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button 
+                type="button"
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  if (customValue.trim()) {
+                    setCurrentEntry(prev => ({ ...prev, medicationName: customValue.trim() }));
+                    setCustomValue('');
+                    setShowCustomInput(false);
+                  }
+                }}
+                disabled={!customValue.trim()}
+                className="flex-1"
+              >
+                Add
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setShowCustomInput(false);
+                  setCustomValue('');
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

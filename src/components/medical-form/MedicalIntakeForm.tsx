@@ -14,7 +14,7 @@ import { PhoneInput } from './PhoneInput';
 import { SpecialistField, SpecialistEntry } from './SpecialistField';
 import { MultiEntryField, type MultiEntryItem } from './MultiEntryField';
 import { ButtonGroup } from './ButtonGroup';
-import { User, Calendar, Mail, Stethoscope, Eye, Heart, Pill, AlertTriangle } from 'lucide-react';
+import { User, Calendar, Mail, Stethoscope, Eye, Heart, Pill, AlertTriangle, Glasses } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { 
@@ -354,7 +354,7 @@ export const MedicalIntakeForm: React.FC = () => {
         return (
           <div className="field-wrapper fade-in">
             <Label className="field-label">
-              <Stethoscope className="field-icon" />
+              <Glasses className="field-icon" />
               Current Optometrist
             </Label>
             <Input 
