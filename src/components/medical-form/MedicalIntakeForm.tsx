@@ -64,7 +64,7 @@ export const MedicalIntakeForm: React.FC = () => {
     firstName: '',
     lastName: '',
     dateOfBirth: { day: undefined, month: undefined, year: undefined },
-    email: '',
+    email: [],
     phone: '',
     optometrist: '',
     familyDoctor: '',
