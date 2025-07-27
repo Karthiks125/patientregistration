@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import puppeteer from "npm:puppeteer@23.11.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -198,9 +199,38 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Convert HTML to PDF using html-pdf-chromium
-    // Note: For now, we'll send the HTML content as email body
-    // In production, you would use a PDF generation service
+    // Generate PDF using Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ]
+    });
+    
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '1in',
+        right: '1in',
+        bottom: '1in',
+        left: '1in'
+      }
+    });
+    
+    await browser.close();
+    
+    // Convert PDF buffer to base64 for email attachment
+    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
     
     // Send email using SendGrid
     const SENDGRID_API_KEY = Deno.env.get('SENDGRID_FORM_KEY');
@@ -223,6 +253,14 @@ const handler = async (req: Request): Promise<Response> => {
         {
           type: "text/html",
           value: htmlContent
+        }
+      ],
+      attachments: [
+        {
+          content: pdfBase64,
+          filename: `Patient_Registration_${patientData.firstName}_${patientData.lastName}.pdf`,
+          type: "application/pdf",
+          disposition: "attachment"
         }
       ]
     };

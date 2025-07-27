@@ -49,6 +49,7 @@ interface FormData {
   eyeSurgeries: any[];
   eyeLasers: any[];
   eyeInjuries: string[];
+  eyeDrops: string[];
   eyeMedications: any[];
   medications: string[];
   medicalConditions: string[];
@@ -72,6 +73,7 @@ export const MedicalIntakeForm: React.FC = () => {
     eyeSurgeries: [],
     eyeLasers: [],
     eyeInjuries: [],
+    eyeDrops: [],
     eyeMedications: [],
     medications: [],
     medicalConditions: [],
@@ -92,7 +94,7 @@ export const MedicalIntakeForm: React.FC = () => {
     {
       title: 'Eye History',
       icon: Eye,
-      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries', 'eyeMedications']
+      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries', 'eyeDrops', 'eyeMedications']
     },
     {
       title: 'Medical History',
@@ -178,6 +180,7 @@ export const MedicalIntakeForm: React.FC = () => {
         eye_surgeries: formData.eyeSurgeries,
         eye_lasers: formData.eyeLasers,
         eye_injuries: formData.eyeInjuries,
+        eye_drops: formData.eyeDrops,
         eye_medications: formData.eyeMedications,
         medications: formData.medications,
         medical_conditions: formData.medicalConditions,
@@ -213,7 +216,7 @@ export const MedicalIntakeForm: React.FC = () => {
         eyeSurgeries: formData.eyeSurgeries || [],
         eyeLasers: formData.eyeLasers || [],
         eyeInjuries: formData.eyeInjuries || [],
-        eyeDrops: [], // This field doesn't exist in current form but expected by PDF
+        eyeDrops: formData.eyeDrops || [],
         eyeMedications: formData.eyeMedications || [],
         regularMedications: formData.medications || [],
         regularConditions: formData.medicalConditions || [],
@@ -238,10 +241,35 @@ export const MedicalIntakeForm: React.FC = () => {
         });
       } else {
         console.log('PDF generated and email sent:', pdfResponse);
-        toast({
-          title: "Registration completed successfully!",
-          description: "Your medical intake form has been received and a confirmation has been sent to your email."
-        });
+        // Full screen success message for 7 seconds
+        const fullScreenDiv = document.createElement('div');
+        fullScreenDiv.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.9);
+          color: white;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          font-size: 2rem;
+          text-align: center;
+        `;
+        fullScreenDiv.innerHTML = `
+          <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+          <div style="font-size: 2rem; margin-bottom: 1rem;">Registration Completed Successfully!</div>
+          <div style="font-size: 1.2rem;">Your medical intake form has been received and a confirmation has been sent to your email.</div>
+        `;
+        document.body.appendChild(fullScreenDiv);
+        
+        setTimeout(() => {
+          document.body.removeChild(fullScreenDiv);
+          window.location.href = '/';
+        }, 7000);
       }
 
       // Reset form
@@ -259,6 +287,7 @@ export const MedicalIntakeForm: React.FC = () => {
         eyeSurgeries: [],
         eyeLasers: [],
         eyeInjuries: [],
+        eyeDrops: [],
         eyeMedications: [],
         medications: [],
         medicalConditions: [],
@@ -503,6 +532,23 @@ export const MedicalIntakeForm: React.FC = () => {
               options={eyeInjuryOptions}
               value={formData.eyeInjuries}
               onChange={(value) => updateField('eyeInjuries', value)}
+              label=""
+              allowOther={true}
+            />
+          </div>
+          );
+
+      case 'eyeDrops':
+        return (
+          <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              <Eye className="field-icon" />
+              Eye Drops
+            </Label>
+            <ClickableOptions
+              options={eyeMedicationOptions}
+              value={formData.eyeDrops}
+              onChange={(value) => updateField('eyeDrops', value)}
               label=""
               allowOther={true}
             />
