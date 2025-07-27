@@ -32,6 +32,78 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_registrations: {
+        Row: {
+          contact_lens_history: string | null
+          created_at: string
+          date_of_birth: Json
+          drug_allergies: Json | null
+          email: string
+          eye_diseases: Json | null
+          eye_drops: Json | null
+          eye_injuries: Json | null
+          eye_lasers: Json | null
+          eye_medications: Json | null
+          eye_surgeries: Json | null
+          family_doctor: string | null
+          first_name: string
+          id: string
+          last_name: string
+          optometrist: string | null
+          phone: string | null
+          regular_conditions: Json | null
+          regular_medications: Json | null
+          specialists: Json | null
+          updated_at: string
+        }
+        Insert: {
+          contact_lens_history?: string | null
+          created_at?: string
+          date_of_birth: Json
+          drug_allergies?: Json | null
+          email: string
+          eye_diseases?: Json | null
+          eye_drops?: Json | null
+          eye_injuries?: Json | null
+          eye_lasers?: Json | null
+          eye_medications?: Json | null
+          eye_surgeries?: Json | null
+          family_doctor?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          optometrist?: string | null
+          phone?: string | null
+          regular_conditions?: Json | null
+          regular_medications?: Json | null
+          specialists?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          contact_lens_history?: string | null
+          created_at?: string
+          date_of_birth?: Json
+          drug_allergies?: Json | null
+          email?: string
+          eye_diseases?: Json | null
+          eye_drops?: Json | null
+          eye_injuries?: Json | null
+          eye_lasers?: Json | null
+          eye_medications?: Json | null
+          eye_surgeries?: Json | null
+          family_doctor?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          optometrist?: string | null
+          phone?: string | null
+          regular_conditions?: Json | null
+          regular_medications?: Json | null
+          specialists?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       triagedata: {
         Row: {
           dob: string
