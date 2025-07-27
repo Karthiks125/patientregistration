@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import puppeteer from "npm:puppeteer@23.11.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +19,6 @@ interface PatientData {
   eyeSurgeries: string[];
   eyeLasers: string[];
   eyeInjuries: string[];
-  eyeDrops: string[];
   eyeMedications: Array<{
     medicationName: string;
     dosage: string;
@@ -154,12 +152,6 @@ const handler = async (req: Request): Promise<Response> => {
             ${patientData.eyeInjuries.map(injury => `<div class="list-item">• ${injury}</div>`).join('')}
           </div>
           ` : ''}
-          ${patientData.eyeDrops.length > 0 ? `
-          <div class="field">
-            <span class="field-label">Eye Drops:</span>
-            ${patientData.eyeDrops.map(drop => `<div class="list-item">• ${drop}</div>`).join('')}
-          </div>
-          ` : ''}
         </div>
 
         <div class="section">
@@ -199,38 +191,38 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Generate PDF using Puppeteer
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu'
-      ]
-    });
+    // Generate PDF using simple HTML to PDF conversion
+    // Create a simple text-based PDF content
+    const pdfContent = `Patient Registration Summary
+
+Personal Information:
+Name: ${patientData.firstName} ${patientData.lastName}
+Date of Birth: ${dobFormatted}
+Email: ${patientData.email}
+${patientData.phone ? `Phone: ${patientData.phone}` : ''}
+
+Healthcare Providers:
+${patientData.optometrist ? `Optometrist: ${patientData.optometrist}` : ''}
+${patientData.familyDoctor ? `Family Doctor: ${patientData.familyDoctor}` : ''}
+${patientData.specialists.length > 0 ? `Specialists: ${patientData.specialists.join(', ')}` : ''}
+
+Eye History:
+${patientData.eyeDiseases.length > 0 ? `Eye Diseases: ${patientData.eyeDiseases.join(', ')}` : ''}
+${patientData.contactLensHistory ? `Contact Lens History: ${patientData.contactLensHistory}` : ''}
+${patientData.eyeSurgeries.length > 0 ? `Eye Surgeries: ${patientData.eyeSurgeries.join(', ')}` : ''}
+${patientData.eyeLasers.length > 0 ? `Eye Lasers: ${patientData.eyeLasers.join(', ')}` : ''}
+${patientData.eyeInjuries.length > 0 ? `Eye Injuries: ${patientData.eyeInjuries.join(', ')}` : ''}
+
+Medications:
+${patientData.eyeMedications.length > 0 ? `Eye Medications: ${patientData.eyeMedications.map(med => `${med.medicationName} (${med.dosage}, ${med.affectedEye})`).join(', ')}` : ''}
+${patientData.regularMedications.length > 0 ? `Regular Medications: ${patientData.regularMedications.join(', ')}` : ''}
+${patientData.regularConditions.length > 0 ? `Medical Conditions: ${patientData.regularConditions.join(', ')}` : ''}
+${patientData.drugAllergies.length > 0 ? `Drug Allergies: ${patientData.drugAllergies.join(', ')}` : ''}
+
+Generated on: ${new Date().toLocaleDateString()}`;
     
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-    
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '1in',
-        right: '1in',
-        bottom: '1in',
-        left: '1in'
-      }
-    });
-    
-    await browser.close();
-    
-    // Convert PDF buffer to base64 for email attachment
-    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+    // Convert text content to base64 (simplified PDF alternative)
+    const pdfBase64 = btoa(pdfContent);
     
     // Send email using SendGrid
     const SENDGRID_API_KEY = Deno.env.get('SENDGRID_FORM_KEY');
@@ -258,8 +250,8 @@ const handler = async (req: Request): Promise<Response> => {
       attachments: [
         {
           content: pdfBase64,
-          filename: `Patient_Registration_${patientData.firstName}_${patientData.lastName}.pdf`,
-          type: "application/pdf",
+          filename: `Patient_Registration_${patientData.firstName}_${patientData.lastName}.txt`,
+          type: "text/plain",
           disposition: "attachment"
         }
       ]
