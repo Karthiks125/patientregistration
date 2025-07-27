@@ -312,12 +312,12 @@ export const MedicalIntakeForm: React.FC = () => {
                   Eye Diseases
                 </FormLabel>
                 <FormControl>
-                  <MultiSelectField
-                    options={medicalData.eyeDiseases}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search eye diseases..."
-                  />
+                   <MultiSelectField
+                     options={medicalData.eyeDisorders}
+                     value={field.value}
+                     onChange={field.onChange}
+                     placeholder="Type to search eye diseases..."
+                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -510,12 +510,12 @@ export const MedicalIntakeForm: React.FC = () => {
                   Regular Medical Conditions
                 </FormLabel>
                 <FormControl>
-                  <MultiSelectField
-                    options={medicalData.regularConditions}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Type to search conditions..."
-                  />
+                   <MultiSelectField
+                     options={medicalData.medicalConditions}
+                     value={field.value}
+                     onChange={field.onChange}
+                     placeholder="Type to search conditions..."
+                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>

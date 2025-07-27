@@ -1,133 +1,200 @@
 // Medical data for autocomplete fields
 
-export const eyeDiseases = [
-  // Common eye diseases
-  "Cataract",
-  "Glaucoma", 
-  "Diabetic Retinopathy",
-  "Macular Degeneration",
-  "Dry Eye Syndrome",
-  "Uveitis",
-  "Retinal Detachment",
-  "Corneal Dystrophy",
-  "Pterygium",
-  "Chalazion",
-  "Stye",
-  "Conjunctivitis",
-  "Keratitis",
-  "Floaters",
-  // Uncommon eye diseases
-  "Fuchs' Dystrophy",
-  "Keratoconus",
-  "Retinitis Pigmentosa",
-  "Stargardt Disease",
-  "Leber Hereditary Optic Neuropathy",
-  "Charles Bonnet Syndrome",
-  "Ocular Hypertension",
-  "Anisocoria"
-];
-
 export const eyeSurgeries = [
   "Cataract Surgery",
   "LASIK",
   "PRK (Photorefractive Keratectomy)",
   "Vitrectomy",
-  "Glaucoma Surgery",
+  "Glaucoma Surgery (Trabeculectomy)",
   "Corneal Transplant",
   "Retinal Detachment Repair",
-  "Eyelid Surgery (Blepharoplasty)",
+  "Strabismus Surgery",
   "Pterygium Removal",
-  "Chalazion Removal",
-  "Trabeculectomy",
-  "Tube Shunt Surgery",
-  "Scleral Buckle",
-  "Macular Hole Repair"
+  "Blepharoplasty",
+  "DCR (Dacryocystorhinostomy)",
+  "Ectropion/Entropion Repair",
+  "Ptosis Repair",
+  "Tube (Glaucoma Drainage Device)",
+  "Keratoprosthesis",
+  "Intravitreal Injection",
+  "Pars Plana Vitrectomy",
+  "Other Surgery",
+  "None / Not Applicable"
+];
+
+export const eyeLasers = [
+  "Laser Iridotomy",
+  "SLT (Selective Laser Trabeculoplasty)",
+  "ALT (Argon Laser Trabeculoplasty)",
+  "YAG Laser Capsulotomy",
+  "Panretinal Photocoagulation",
+  "Focal / Grid Laser",
+  "Laser Retinopexy",
+  "Cyclophotocoagulation",
+  "Nd:YAG Laser",
+  "Laser Suture Lysis",
+  "Photocoagulation (general)",
+  "Other Laser",
+  "None / Not Applicable"
+];
+
+export const eyeDisorders = [
+  "Cataract",
+  "Glaucoma",
+  "Diabetic Retinopathy",
+  "Age-related Macular Degeneration (AMD)",
+  "Uveitis",
+  "Retinal Detachment",
+  "Dry Eye Syndrome",
+  "Corneal Ulcer",
+  "Conjunctivitis (Pink Eye)",
+  "Strabismus",
+  "Keratoconus",
+  "Blepharitis",
+  "Graves Eye Disease / Thyroid Ophthalmopathy",
+  "Retinitis Pigmentosa",
+  "Optic Neuritis",
+  "Ocular Migraine",
+  "Amblyopia (Lazy Eye)",
+  "Episcleritis/Scleritis",
+  "Macular Hole",
+  "Central Serous Retinopathy",
+  "Other Disease/Disorder",
+  "None / Not Applicable"
 ];
 
 export const eyeDrops = [
-  // Canadian common eye drops
-  "Artificial Tears",
-  "Timolol",
-  "Latanoprost (Xalatan)",
-  "Dorzolamide (Trusopt)",
-  "Brimonidine (Alphagan)",
-  "Bimatoprost (Lumigan)",
-  "Travoprost (Travatan)",
-  "Cyclopentolate",
-  "Tropicamide",
-  "Prednisolone Acetate",
-  "Tobramycin",
-  "Moxifloxacin (Vigamox)",
-  "Ofloxacin",
-  "Gentamicin",
+  "Xalatan (Latanoprost)",
+  "Lumigan (Bimatoprost)",
+  "Travatan (Travoprost)",
+  "Monoprost (Tafluprost)",
+  "Vyzulta (Latanoprostene bunod)",
+  "Simbrinza (Brinzolamide/Brimonidine)",
+  "Timoptic (Timolol)",
+  "Cosopt (Dorzolamide/Timolol)",
+  "Azopt (Brinzolamide)",
+  "Trusopt (Dorzolamide)",
+  "Combigan (Brimonidine/Timolol)",
+  "Betagan (Levobunolol)",
+  "Betoptic S (Betaxolol)",
+  "Alphagan (Brimonidine)",
+  "Iopidine (Apraclonidine)",
+  "Durezol (Difluprednate)",
+  "Pred Forte (Prednisolone acetate)",
+  "Maxidex (Dexamethasone)",
+  "Lotemax (Loteprednol)",
+  "Vexol (Rimexolone)",
+  "Alrex (Loteprednol etabonate)",
+  "Nevanac (Nepafenac)",
+  "Acular (Ketorolac)",
+  "Tobradex (Tobramycin/Dexamethasone)",
+  "Zylet (Loteprednol/Tobramycin)",
+  "Vigamox (Moxifloxacin)",
+  "Ciloxan (Ciprofloxacin)",
+  "Blephamide (Sulfacetamide)",
+  "Pataday (Olopatadine)",
+  "Patanol (Olopatadine)",
+  "Zaditor (Ketotifen)",
+  "Emadine (Emedastine)",
+  "Acyclovir (oral/ointment)",
+  "Valacyclovir (oral)",
+  "Muro 128 (Sodium chloride drops/ointment)",
   "Refresh Tears",
-  "Systane",
-  "TheraTears"
+  "Systane (all types)",
+  "Blink Tears",
+  "GenTeal",
+  "TheraTears",
+  "Bion Tears",
+  "Optive",
+  "Lacrisert",
+  "Artificial Tears (general)",
+  "Diamox (Acetazolamide)",
+  "Methazolamide (Neptazane)",
+  "Omega-3/Fish Oil",
+  "Vitamin D",
+  "Vitamin C",
+  "Other Eye Drops/Gels",
+  "None / Not Applicable"
 ];
 
-export const systemicDiseases = [
-  // Common systemic diseases
-  "Diabetes Type 1",
-  "Diabetes Type 2",
+export const regularMedications = [
+  "Metformin",
+  "Lipitor (Atorvastatin)",
+  "Crestor (Rosuvastatin)",
+  "Simvastatin",
+  "Ramipril",
+  "Amlodipine",
+  "Losartan",
+  "Hydrochlorothiazide",
+  "Bisoprolol",
+  "Insulin (any type)",
+  "Ventolin (Salbutamol)",
+  "Flovent (Fluticasone)",
+  "Prednisone",
+  "Clopidogrel (Plavix)",
+  "Warfarin",
+  "Apixaban (Eliquis)",
+  "Aspirin (ASA)",
+  "Tylenol (Acetaminophen)",
+  "Advil (Ibuprofen)",
+  "Aleve (Naproxen)",
+  "Meloxicam",
+  "Omeprazole",
+  "Pantoprazole",
+  "Domperidone",
+  "Probiotic (general)",
+  "Melatonin",
+  "Claritin (Loratadine)",
+  "Zyrtec (Cetirizine)",
+  "Allegra (Fexofenadine)",
+  "Calcium supplements",
+  "Vitamin D",
+  "Vitamin C",
+  "Vitamin E",
+  "Fish oil",
+  "Multivitamin",
+  "Magnesium",
+  "Iron",
+  "Zinc",
+  "Venlafaxine (Effexor)",
+  "Paroxetine (Paxil)",
+  "Citalopram (Celexa)",
+  "Quetiapine (Seroquel)",
+  "Diazepam (Valium)",
+  "Gabapentin",
+  "Aripiprazole (Abilify)",
+  "Escitalopram (Cipralex)",
+  "Other Meds",
+  "None / Not Applicable"
+];
+
+export const medicalConditions = [
+  "Diabetes",
   "Hypertension",
-  "Sleep Apnea",
-  "Stroke",
-  "Cancer",
-  "Prostate Issues",
-  "Malignant Hyperthermia",
-  "Heart Disease",
-  "High Cholesterol",
-  "Arthritis",
-  "Osteoporosis",
-  // Uncommon systemic diseases
-  "Autoimmune Disorders",
-  "Rheumatoid Arthritis",
-  "Lupus",
-  "Multiple Sclerosis",
-  "Thyroid Disease",
-  "Hyperthyroidism",
-  "Hypothyroidism",
-  "Renal Disease",
-  "Kidney Disease",
-  "Liver Disease",
+  "Cholesterol (hyperlipidemia)",
   "COPD",
   "Asthma",
-  "Migraine",
-  "Epilepsy",
+  "Stroke",
+  "Cancer",
+  "Sleep Apnea",
+  "Thyroid Disease",
+  "Kidney Disease",
+  "Autoimmune Disorders",
+  "Malignant Hyperthermia",
+  "Prostate Issues",
   "Depression",
-  "Anxiety"
+  "Anxiety",
+  "Other Conditions",
+  "None / Not Applicable"
 ];
 
-export const medications = [
-  // Common Canadian medications
-  "Acetaminophen (Tylenol)",
-  "Ibuprofen (Advil)",
-  "ASA (Aspirin)",
-  "Metformin",
-  "Lisinopril",
-  "Amlodipine",
-  "Atorvastatin (Lipitor)",
-  "Metoprolol",
-  "Omeprazole",
-  "Levothyroxine",
-  "Warfarin",
-  "Clopidogrel (Plavix)",
-  "Ramipril",
-  "Hydrochlorothiazide",
-  "Simvastatin",
-  "Pantoprazole",
-  "Rosuvastatin (Crestor)",
-  "Losartan",
-  "Gabapentin",
-  "Amoxicillin",
-  "Azithromycin",
-  "Ciprofloxacin",
-  "Prednisone",
-  "Insulin",
-  "Vitamin D",
-  "Vitamin B12",
-  "Iron Supplements",
-  "Calcium Supplements"
+export const drugAllergies = [
+  "Penicillin",
+  "Sulfa Drugs",
+  "Aspirin",
+  "Latex",
+  "Other",
+  "None / Not Applicable"
 ];
 
 export const commonOptometrists = [
@@ -174,17 +241,6 @@ export const specialties = [
   "Infectious Disease Specialist"
 ];
 
-export const eyeLasers = [
-  "Laser Iridotomy",
-  "Photocoagulation",
-  "Selective Laser Trabeculoplasty",
-  "Laser Capsulotomy",
-  "Retinal Photocoagulation",
-  "YAG Laser Capsulotomy",
-  "Argon Laser Trabeculoplasty",
-  "Cyclophotocoagulation"
-];
-
 export const eyeInjuries = [
   "Corneal Abrasion",
   "Foreign Body",
@@ -195,42 +251,20 @@ export const eyeInjuries = [
   "Penetrating Injury",
   "Blunt Trauma",
   "Thermal Burn",
-  "Welding Flash"
+  "Welding Flash",
+  "Other Injury",
+  "None / Not Applicable"
 ];
 
-export const regularMedications = [
-  "Ibuprofen",
-  "Acetaminophen",
-  "Metformin",
-  "Lipitor",
-  "Simvastatin",
-  "Aspirin",
-  "Lisinopril",
-  "Amlodipine",
-  "Metoprolol",
-  "Omeprazole",
-  "Levothyroxine",
-  "Warfarin",
-  "Clopidogrel",
-  "Ramipril"
+// Dosage frequency options for medications
+export const dosageFrequencies = [
+  "Once daily",
+  "Twice daily", 
+  "Thrice daily",
+  "Four times daily",
+  "Five times daily",
+  "More than 5 times daily"
 ];
 
-export const regularConditions = [
-  "Diabetes",
-  "Hypertension", 
-  "Sleep Apnea",
-  "Stroke",
-  "Cancer",
-  "Prostate Issues",
-  "Malignant Hyperthermia",
-  "Autoimmune Disorders",
-  "Thyroid Disease",
-  "Kidney Disease"
-];
-
-export const drugAllergies = [
-  "Penicillin",
-  "Sulfa Drugs",
-  "Aspirin",
-  "Latex"
-];
+// Eye options for medications
+export const eyeOptions = ["Left", "Right", "Both"];
