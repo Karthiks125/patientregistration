@@ -25,9 +25,7 @@ import {
   medicationOptions, 
   medicalConditionOptions,
   specialistOptions,
-  eyeInjuryOptions,
-  commonOptometrists,
-  commonFamilyDoctors
+  eyeInjuryOptions
 } from '@/data/medicalData';
 
 interface FormData {
@@ -64,7 +62,7 @@ export const MedicalIntakeForm: React.FC = () => {
     firstName: '',
     lastName: '',
     dateOfBirth: { day: undefined, month: undefined, year: undefined },
-    email: [],
+    email: '',
     phone: '',
     optometrist: '',
     familyDoctor: '',
@@ -200,11 +198,33 @@ export const MedicalIntakeForm: React.FC = () => {
 
       console.log('Data saved to database:', insertedData);
 
+      // Prepare data for PDF generation with proper array formatting
+      const pdfData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        dateOfBirth: formData.dateOfBirth,
+        email: formData.email,
+        phone: formData.phone,
+        optometrist: formData.optometrist,
+        familyDoctor: formData.familyDoctor,
+        specialists: (formData.specialistsWithDoctors || []).map(s => s.specialist),
+        eyeDiseases: formData.eyeDiseases || [],
+        contactLensHistory: formData.contactLensHistory,
+        eyeSurgeries: formData.eyeSurgeries || [],
+        eyeLasers: formData.eyeLasers || [],
+        eyeInjuries: formData.eyeInjuries || [],
+        eyeDrops: [], // This field doesn't exist in current form but expected by PDF
+        eyeMedications: formData.eyeMedications || [],
+        regularMedications: formData.medications || [],
+        regularConditions: formData.medicalConditions || [],
+        drugAllergies: formData.drugAllergies || []
+      };
+
       // Call Edge Function to generate PDF and send email
       const { data: pdfResponse, error: pdfError } = await supabase.functions
         .invoke('generate_patient_pdf', {
           body: {
-            patientData: formData,
+            patientData: pdfData,
             emailTo: 'kartaitesting@gmail.com'
           }
         });
