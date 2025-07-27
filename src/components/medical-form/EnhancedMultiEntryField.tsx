@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AutocompleteField } from './AutocompleteField';
+import { SideAutocompleteField } from './SideAutocompleteField';
 import { Plus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -108,7 +108,7 @@ export const EnhancedMultiEntryField: React.FC<EnhancedMultiEntryFieldProps> = (
       {!hasNoneSelected && (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3">
-            <AutocompleteField
+            <SideAutocompleteField
               options={options}
               value={currentEntry.name}
               onChange={(name) => setCurrentEntry(prev => ({ ...prev, name }))}

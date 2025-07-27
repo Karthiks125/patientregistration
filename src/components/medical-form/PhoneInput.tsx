@@ -14,17 +14,8 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({ value, onChange, classNa
     // Remove all non-digits
     const digits = input.replace(/\D/g, '');
     
-    // Limit to 10 digits (Canadian format)
-    const limitedDigits = digits.slice(0, 10);
-    
-    // Format as (XXX) XXX-XXXX
-    if (limitedDigits.length >= 6) {
-      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3, 6)}-${limitedDigits.slice(6)}`;
-    } else if (limitedDigits.length >= 3) {
-      return `(${limitedDigits.slice(0, 3)}) ${limitedDigits.slice(3)}`;
-    } else {
-      return limitedDigits;
-    }
+    // Limit to exactly 10 digits
+    return digits.slice(0, 10);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,21 +31,15 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({ value, onChange, classNa
   };
 
   return (
-    <div className={`space-y-2 ${className || ''}`}>
-      <Label htmlFor="phone" className="flex items-center gap-2">
-        <Phone className="w-4 h-4" />
-        Phone Number
-      </Label>
-      <Input
-        id="phone"
-        type="tel"
-        value={value}
-        onChange={handleChange}
-        onKeyPress={handleKeyPress}
-        placeholder="(XXX) XXX-XXXX"
-        maxLength={14} // (XXX) XXX-XXXX format
-        className="w-full"
-      />
-    </div>
+    <Input
+      id="phone"
+      type="tel"
+      value={value}
+      onChange={handleChange}
+      onKeyPress={handleKeyPress}
+      placeholder="1234567890"
+      maxLength={10} // 10 digits only
+      className="w-full"
+    />
   );
 };

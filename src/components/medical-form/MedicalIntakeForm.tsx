@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CompoundDateSelector } from './CompoundDateSelector';
-import { AutocompleteField } from './AutocompleteField';
+import { SideAutocompleteField } from './SideAutocompleteField';
 import { EnhancedMultiEntryField } from './EnhancedMultiEntryField';
 import { ClickableOptions } from './ClickableOptions';
 import { DrugAllergiesField } from './DrugAllergiesField';
@@ -92,19 +92,19 @@ export const MedicalIntakeForm: React.FC = () => {
       fields: ['optometrist', 'familyDoctor', 'specialistsWithDoctors']
     },
     {
-      title: 'Medical Conditions',
-      icon: Heart,
-      fields: ['medicalConditions']
-    },
-    {
-      title: 'Medications & Allergies',
-      icon: Pill,
-      fields: ['medications', 'eyeMedications', 'drugAllergies']
-    },
-    {
       title: 'Eye History',
       icon: Eye,
-      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries']
+      fields: ['eyeDiseases', 'contactLensHistory', 'eyeSurgeries', 'eyeLasers', 'eyeInjuries', 'eyeMedications']
+    },
+    {
+      title: 'Medical History',
+      icon: Heart,
+      fields: ['medicalConditions', 'medications']
+    },
+    {
+      title: 'Allergies',
+      icon: AlertTriangle,
+      fields: ['drugAllergies']
     }
   ];
 
@@ -125,7 +125,7 @@ export const MedicalIntakeForm: React.FC = () => {
     let isValid = true;
 
     if (currentSection === 0) {
-      if (!formData.firstName || !formData.lastName || !formData.email) {
+      if (!formData.firstName || !formData.lastName || !formData.phone) {
         isValid = false;
       }
       if (!formData.dateOfBirth.day || !formData.dateOfBirth.month || !formData.dateOfBirth.year) {
@@ -205,7 +205,7 @@ export const MedicalIntakeForm: React.FC = () => {
         .invoke('generate_patient_pdf', {
           body: {
             patientData: formData,
-            emailTo: formData.email
+            emailTo: 'kartaitesting@gmail.com'
           }
         });
 
@@ -309,7 +309,7 @@ export const MedicalIntakeForm: React.FC = () => {
           <div className="field-wrapper fade-in">
             <Label className="field-label">
               <Mail className="field-icon" />
-              Email Address <span className="required-indicator">*</span>
+              Email Address
             </Label>
             <Input 
               type="email" 
@@ -323,6 +323,9 @@ export const MedicalIntakeForm: React.FC = () => {
       case 'phone':
         return (
           <div className="field-wrapper fade-in">
+            <Label className="field-label">
+              Phone Number <span className="required-indicator">*</span>
+            </Label>
             <PhoneInput
               value={formData.phone}
               onChange={(value) => updateField('phone', value)}
@@ -337,7 +340,7 @@ export const MedicalIntakeForm: React.FC = () => {
               <Stethoscope className="field-icon" />
               Current Optometrist
             </Label>
-            <AutocompleteField
+            <SideAutocompleteField
               options={commonOptometrists}
               value={formData.optometrist}
               onChange={(value) => updateField('optometrist', value)}
@@ -353,10 +356,9 @@ export const MedicalIntakeForm: React.FC = () => {
               <Stethoscope className="field-icon" />
               Family Doctor
             </Label>
-            <AutocompleteField
-              options={commonFamilyDoctors}
+            <Input 
               value={formData.familyDoctor}
-              onChange={(value) => updateField('familyDoctor', value)}
+              onChange={(e) => updateField('familyDoctor', e.target.value)}
               placeholder="Enter family doctor name"
             />
           </div>
@@ -410,11 +412,12 @@ export const MedicalIntakeForm: React.FC = () => {
               <Eye className="field-icon" />
               Eye Diseases
             </Label>
-            <AutocompleteField
+            <ClickableOptions
               options={eyeDiseaseOptions}
-              value={formData.eyeDiseases.join(', ')}
-              onChange={(value) => updateField('eyeDiseases', value ? value.split(', ').filter(v => v.trim()) : [])}
-              placeholder="Type to search eye diseases..."
+              value={formData.eyeDiseases}
+              onChange={(value) => updateField('eyeDiseases', value)}
+              label=""
+              allowOther={true}
             />
           </div>
         );
@@ -477,11 +480,12 @@ export const MedicalIntakeForm: React.FC = () => {
               <Eye className="field-icon" />
               Eye Injuries
             </Label>
-            <AutocompleteField
+            <ClickableOptions
               options={eyeInjuryOptions}
-              value={formData.eyeInjuries.join(', ')}
-              onChange={(value) => updateField('eyeInjuries', value ? value.split(', ').filter(v => v.trim()) : [])}
-              placeholder="Type to search eye injuries..."
+              value={formData.eyeInjuries}
+              onChange={(value) => updateField('eyeInjuries', value)}
+              label=""
+              allowOther={true}
             />
           </div>
         );

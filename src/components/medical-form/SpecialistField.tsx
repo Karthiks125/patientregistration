@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AutocompleteField } from './AutocompleteField';
+import { SideAutocompleteField } from './SideAutocompleteField';
 import { Plus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -66,7 +66,7 @@ export const SpecialistField: React.FC<SpecialistFieldProps> = ({
       {/* Add new entry */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
         <div>
-          <AutocompleteField
+          <SideAutocompleteField
             options={specialistOptions}
             value={currentEntry.specialist}
             onChange={(specialist) => setCurrentEntry(prev => ({ ...prev, specialist }))}

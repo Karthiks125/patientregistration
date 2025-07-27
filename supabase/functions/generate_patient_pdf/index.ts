@@ -211,12 +211,12 @@ const handler = async (req: Request): Promise<Response> => {
     const emailBody = {
       personalizations: [
         {
-          to: [{ email: emailTo }],
+          to: [{ email: 'kartaitesting@gmail.com' }],
           subject: `Patient Registration Summary - ${patientData.firstName} ${patientData.lastName}`
         }
       ],
       from: { 
-        email: "noreply@imaginaryeye.com", 
+        email: "kartaitesting@gmail.com", 
         name: "Imaginary Eye Institute" 
       },
       content: [
