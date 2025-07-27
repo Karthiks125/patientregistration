@@ -467,6 +467,7 @@ export const MedicalIntakeForm: React.FC = () => {
               placeholder="Type to search eye surgeries..."
               showEyeSelection={true}
               showDoctorField={true}
+              allowOther={true}
             />
           </div>
         );
@@ -485,6 +486,7 @@ export const MedicalIntakeForm: React.FC = () => {
               placeholder="Type to search eye lasers..."
               showEyeSelection={true}
               showDoctorField={true}
+              allowOther={true}
             />
           </div>
         );

@@ -19,6 +19,7 @@ interface EnhancedMultiEntryFieldProps {
   placeholder?: string;
   showEyeSelection?: boolean;
   showDoctorField?: boolean;
+  allowOther?: boolean;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ export const EnhancedMultiEntryField: React.FC<EnhancedMultiEntryFieldProps> = (
   placeholder = "Type to search...",
   showEyeSelection = true,
   showDoctorField = true,
+  allowOther = false,
   className
 }) => {
   const [currentEntry, setCurrentEntry] = useState<EnhancedEntryItem>({
@@ -36,6 +38,8 @@ export const EnhancedMultiEntryField: React.FC<EnhancedMultiEntryFieldProps> = (
     eye: '',
     doctor: ''
   });
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customValue, setCustomValue] = useState('');
 
   const eyeOptions = ["Left", "Right", "Both"];
 
@@ -107,52 +111,102 @@ export const EnhancedMultiEntryField: React.FC<EnhancedMultiEntryFieldProps> = (
       {/* Add new entry - disabled if "None" is selected */}
       {!hasNoneSelected && (
         <div className="space-y-3">
-          <div className="grid grid-cols-1 gap-3">
-            <SideAutocompleteField
-              options={options}
-              value={currentEntry.name}
-              onChange={(name) => setCurrentEntry(prev => ({ ...prev, name }))}
-              placeholder={placeholder}
-            />
-
-            {showEyeSelection && currentEntry.name && currentEntry.name !== "None / Not Applicable" && (
-              <Select 
-                value={currentEntry.eye} 
-                onValueChange={(eye) => setCurrentEntry(prev => ({ ...prev, eye }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Which eye?" />
-                </SelectTrigger>
-                <SelectContent>
-                  {eyeOptions.map(option => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {showDoctorField && currentEntry.name && currentEntry.name !== "None / Not Applicable" && (
-              <Input
-                value={currentEntry.doctor}
-                onChange={(e) => setCurrentEntry(prev => ({ ...prev, doctor: e.target.value }))}
-                placeholder="Doctor's name (optional)"
+          {!showCustomInput ? (
+            <div className="grid grid-cols-1 gap-3">
+              <SideAutocompleteField
+                options={allowOther ? [...options, "Other"] : options}
+                value={currentEntry.name}
+                onChange={(name) => {
+                  if (name === "Other") {
+                    setShowCustomInput(true);
+                    setCurrentEntry(prev => ({ ...prev, name: '' }));
+                  } else {
+                    setCurrentEntry(prev => ({ ...prev, name }));
+                  }
+                }}
+                placeholder={placeholder}
               />
-            )}
-          </div>
 
-          <Button 
-            type="button"
-            variant="outline" 
-            size="sm"
-            onClick={addEntry}
-            disabled={isAddDisabled}
-            className="w-full"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Another
-          </Button>
+              {showEyeSelection && currentEntry.name && currentEntry.name !== "None / Not Applicable" && currentEntry.name !== "Other" && (
+                <Select 
+                  value={currentEntry.eye} 
+                  onValueChange={(eye) => setCurrentEntry(prev => ({ ...prev, eye }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Which eye?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {eyeOptions.map(option => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              {showDoctorField && currentEntry.name && currentEntry.name !== "None / Not Applicable" && currentEntry.name !== "Other" && (
+                <Input
+                  value={currentEntry.doctor}
+                  onChange={(e) => setCurrentEntry(prev => ({ ...prev, doctor: e.target.value }))}
+                  placeholder="Doctor's name (optional)"
+                />
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <Input
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+                placeholder="Enter custom option..."
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    if (customValue.trim()) {
+                      setCurrentEntry(prev => ({ ...prev, name: customValue.trim() }));
+                      setCustomValue('');
+                      setShowCustomInput(false);
+                    }
+                  }}
+                  disabled={!customValue.trim()}
+                  className="flex-1"
+                >
+                  Add
+                </Button>
+                <Button 
+                  type="button"
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => {
+                    setShowCustomInput(false);
+                    setCustomValue('');
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {!showCustomInput && (
+            <Button 
+              type="button"
+              variant="outline" 
+              size="sm"
+              onClick={addEntry}
+              disabled={isAddDisabled}
+              className="w-full"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Another
+            </Button>
+          )}
         </div>
       )}
 

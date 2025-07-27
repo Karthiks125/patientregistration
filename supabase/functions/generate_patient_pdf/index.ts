@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { jsPDF } from "https://esm.sh/jspdf@2.5.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -191,38 +192,103 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Generate PDF using simple HTML to PDF conversion
-    // Create a simple text-based PDF content
-    const pdfContent = `Patient Registration Summary
-
-Personal Information:
-Name: ${patientData.firstName} ${patientData.lastName}
-Date of Birth: ${dobFormatted}
-Email: ${patientData.email}
-${patientData.phone ? `Phone: ${patientData.phone}` : ''}
-
-Healthcare Providers:
-${patientData.optometrist ? `Optometrist: ${patientData.optometrist}` : ''}
-${patientData.familyDoctor ? `Family Doctor: ${patientData.familyDoctor}` : ''}
-${patientData.specialists.length > 0 ? `Specialists: ${patientData.specialists.join(', ')}` : ''}
-
-Eye History:
-${patientData.eyeDiseases.length > 0 ? `Eye Diseases: ${patientData.eyeDiseases.join(', ')}` : ''}
-${patientData.contactLensHistory ? `Contact Lens History: ${patientData.contactLensHistory}` : ''}
-${patientData.eyeSurgeries.length > 0 ? `Eye Surgeries: ${patientData.eyeSurgeries.join(', ')}` : ''}
-${patientData.eyeLasers.length > 0 ? `Eye Lasers: ${patientData.eyeLasers.join(', ')}` : ''}
-${patientData.eyeInjuries.length > 0 ? `Eye Injuries: ${patientData.eyeInjuries.join(', ')}` : ''}
-
-Medications:
-${patientData.eyeMedications.length > 0 ? `Eye Medications: ${patientData.eyeMedications.map(med => `${med.medicationName} (${med.dosage}, ${med.affectedEye})`).join(', ')}` : ''}
-${patientData.regularMedications.length > 0 ? `Regular Medications: ${patientData.regularMedications.join(', ')}` : ''}
-${patientData.regularConditions.length > 0 ? `Medical Conditions: ${patientData.regularConditions.join(', ')}` : ''}
-${patientData.drugAllergies.length > 0 ? `Drug Allergies: ${patientData.drugAllergies.join(', ')}` : ''}
-
-Generated on: ${new Date().toLocaleDateString()}`;
+    // Generate actual PDF using jsPDF
+    const doc = new jsPDF();
+    const lineHeight = 7;
+    let yPosition = 20;
     
-    // Convert text content to base64 (simplified PDF alternative)
-    const pdfBase64 = btoa(pdfContent);
+    // Helper function to add text with word wrap
+    const addText = (text: string, x: number = 20, fontSize: number = 12, isBold: boolean = false) => {
+      if (isBold) {
+        doc.setFont("helvetica", "bold");
+      } else {
+        doc.setFont("helvetica", "normal");
+      }
+      doc.setFontSize(fontSize);
+      
+      const lines = doc.splitTextToSize(text, 170);
+      lines.forEach((line: string) => {
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(line, x, yPosition);
+        yPosition += lineHeight;
+      });
+      yPosition += 3; // Extra spacing after sections
+    };
+
+    // Title
+    addText("👁️ Imaginary Eye Institute", 20, 18, true);
+    addText("Patient Registration Summary", 20, 16, true);
+    addText(`Generated on ${new Date().toLocaleDateString()}`, 20, 10);
+    yPosition += 5;
+
+    // Personal Information
+    addText("PERSONAL INFORMATION", 20, 14, true);
+    addText(`Name: ${patientData.firstName} ${patientData.lastName}`);
+    addText(`Date of Birth: ${dobFormatted}`);
+    addText(`Email: ${patientData.email}`);
+    if (patientData.phone) addText(`Phone: ${patientData.phone}`);
+    yPosition += 5;
+
+    // Healthcare Providers
+    addText("HEALTHCARE PROVIDERS", 20, 14, true);
+    if (patientData.optometrist) addText(`Optometrist: ${patientData.optometrist}`);
+    if (patientData.familyDoctor) addText(`Family Doctor: ${patientData.familyDoctor}`);
+    if (patientData.specialists.length > 0) {
+      addText(`Specialists: ${patientData.specialists.join(', ')}`);
+    }
+    yPosition += 5;
+
+    // Eye History
+    addText("EYE HISTORY", 20, 14, true);
+    if (patientData.eyeDiseases.length > 0) {
+      addText(`Eye Diseases: ${patientData.eyeDiseases.join(', ')}`);
+    }
+    if (patientData.contactLensHistory) {
+      addText(`Contact Lens History: ${patientData.contactLensHistory}`);
+    }
+    if (patientData.eyeSurgeries.length > 0) {
+      const surgeries = patientData.eyeSurgeries.map((surgery: any) => 
+        typeof surgery === 'string' ? surgery : 
+        `${surgery.name}${surgery.eye ? ` (${surgery.eye})` : ''}${surgery.doctor ? ` - Dr. ${surgery.doctor}` : ''}`
+      ).join(', ');
+      addText(`Eye Surgeries: ${surgeries}`);
+    }
+    if (patientData.eyeLasers.length > 0) {
+      const lasers = patientData.eyeLasers.map((laser: any) => 
+        typeof laser === 'string' ? laser : 
+        `${laser.name}${laser.eye ? ` (${laser.eye})` : ''}${laser.doctor ? ` - Dr. ${laser.doctor}` : ''}`
+      ).join(', ');
+      addText(`Eye Lasers: ${lasers}`);
+    }
+    if (patientData.eyeInjuries.length > 0) {
+      addText(`Eye Injuries: ${patientData.eyeInjuries.join(', ')}`);
+    }
+    yPosition += 5;
+
+    // Medications
+    addText("MEDICATIONS", 20, 14, true);
+    if (patientData.eyeMedications.length > 0) {
+      const eyeMeds = patientData.eyeMedications.map((med: any) => 
+        `${med.medicationName} (${med.dosage}, ${med.affectedEye})`
+      ).join(', ');
+      addText(`Eye Medications: ${eyeMeds}`);
+    }
+    if (patientData.regularMedications.length > 0) {
+      addText(`Regular Medications: ${patientData.regularMedications.join(', ')}`);
+    }
+    if (patientData.regularConditions.length > 0) {
+      addText(`Medical Conditions: ${patientData.regularConditions.join(', ')}`);
+    }
+    if (patientData.drugAllergies.length > 0) {
+      addText(`Drug Allergies: ${patientData.drugAllergies.join(', ')}`);
+    }
+
+    // Generate PDF as base64
+    const pdfBytes = doc.output('arraybuffer');
+    const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
     
     // Send email using SendGrid
     const SENDGRID_API_KEY = Deno.env.get('SENDGRID_FORM_KEY');
@@ -250,8 +316,8 @@ Generated on: ${new Date().toLocaleDateString()}`;
       attachments: [
         {
           content: pdfBase64,
-          filename: `Patient_Registration_${patientData.firstName}_${patientData.lastName}.txt`,
-          type: "text/plain",
+          filename: `Patient_Registration_${patientData.firstName}_${patientData.lastName}.pdf`,
+          type: "application/pdf",
           disposition: "attachment"
         }
       ]
