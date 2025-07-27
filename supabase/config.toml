@@ -1,1 +1,4 @@
 project_id = "npptczioijrfmsorlwbd"
+
+[functions.generate_patient_pdf]
+verify_jwt = false

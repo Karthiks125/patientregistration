@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, User, Mail, Phone, Stethoscope, Eye, Heart, Pill, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 import { MultiSelectField } from './MultiSelectField';
 import { AutocompleteField } from './AutocompleteField';
@@ -54,6 +55,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export const MedicalIntakeForm: React.FC = () => {
   const [currentSection, setCurrentSection] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -121,12 +123,87 @@ export const MedicalIntakeForm: React.FC = () => {
     setCurrentSection(prev => Math.max(prev - 1, 0));
   };
 
-  const onSubmit = (data: FormData) => {
-    console.log('Form submitted:', data);
-    toast({
-      title: "Form submitted successfully!",
-      description: "Your medical intake form has been received."
-    });
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      console.log('Form submitted:', data);
+
+      // Prepare data for database insert
+      const dbData = {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        date_of_birth: data.dateOfBirth,
+        email: data.email,
+        phone: data.phone || null,
+        optometrist: data.optometrist || null,
+        family_doctor: data.familyDoctor || null,
+        specialists: data.specialists,
+        eye_diseases: data.eyeDiseases,
+        contact_lens_history: data.contactLensHistory || null,
+        eye_surgeries: data.eyeSurgeries,
+        eye_lasers: data.eyeLasers,
+        eye_injuries: data.eyeInjuries,
+        eye_drops: data.eyeDrops,
+        eye_medications: data.eyeMedications,
+        regular_medications: data.regularMedications,
+        regular_conditions: data.regularConditions,
+        drug_allergies: data.drugAllergies
+      };
+
+      // Save to Supabase
+      const { data: insertedData, error: insertError } = await supabase
+        .from('patient_registrations')
+        .insert(dbData)
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error saving to database:', insertError);
+        throw new Error('Failed to save registration data');
+      }
+
+      console.log('Data saved to database:', insertedData);
+
+      // Call Edge Function to generate PDF and send email
+      const { data: pdfResponse, error: pdfError } = await supabase.functions
+        .invoke('generate_patient_pdf', {
+          body: {
+            patientData: data,
+            emailTo: data.email
+          }
+        });
+
+      if (pdfError) {
+        console.error('Error generating PDF:', pdfError);
+        // Don't throw error here - data is saved, just PDF failed
+        toast({
+          title: "Registration saved successfully!",
+          description: "However, there was an issue sending the confirmation email. Please contact us if you need a copy.",
+          variant: "default"
+        });
+      } else {
+        console.log('PDF generated and email sent:', pdfResponse);
+        toast({
+          title: "Registration completed successfully!",
+          description: "Your medical intake form has been received and a confirmation has been sent to your email."
+        });
+      }
+
+      // Reset form
+      form.reset();
+      setCurrentSection(0);
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Error submitting form",
+        description: "There was an error processing your registration. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderField = (fieldName: string) => {
@@ -613,8 +690,8 @@ export const MedicalIntakeForm: React.FC = () => {
               </Button>
 
               {currentSection === sections.length - 1 ? (
-                <Button type="submit" className="slide-in">
-                  Submit Form
+                <Button type="submit" className="slide-in" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit Form'}
                 </Button>
               ) : (
                 <Button type="button" onClick={nextSection} className="slide-in">
