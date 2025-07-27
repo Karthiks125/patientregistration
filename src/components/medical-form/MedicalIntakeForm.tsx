@@ -340,10 +340,9 @@ export const MedicalIntakeForm: React.FC = () => {
               <Stethoscope className="field-icon" />
               Current Optometrist
             </Label>
-            <SideAutocompleteField
-              options={commonOptometrists}
+            <Input 
               value={formData.optometrist}
-              onChange={(value) => updateField('optometrist', value)}
+              onChange={(e) => updateField('optometrist', e.target.value)}
               placeholder="Enter optometrist name"
             />
           </div>

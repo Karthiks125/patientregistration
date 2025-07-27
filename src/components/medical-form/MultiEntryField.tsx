@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AutocompleteField } from './AutocompleteField';
+import { SideAutocompleteField } from './SideAutocompleteField';
 import { Plus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -72,7 +72,7 @@ export const MultiEntryField: React.FC<MultiEntryFieldProps> = ({
       {/* Add new entry */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
         <div className="md:col-span-1">
-          <AutocompleteField
+          <SideAutocompleteField
             options={medicationOptions}
             value={currentEntry.medicationName}
             onChange={(medicationName) => setCurrentEntry(prev => ({ ...prev, medicationName }))}
