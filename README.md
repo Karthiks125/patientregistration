@@ -1,73 +1,62 @@
-# Welcome to your Lovable project
+# Imaginary Eye Institute – Patient Registration Form (Prototype)
 
-## Project info
+**A HIPAA-conscious, patient registration form.**  
+This project is a **proof-of-concept**, developed out of conceptual interest to showcase full-stack automation—not intended for production without proper compliance measures.
 
-**URL**: https://lovable.dev/projects/42a3dfff-942d-44e2-8377-b14d4b12aeb5
+**🔗 [Live Demo](https://patientregistration.lovable.app/)**
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚀 Features Overview
 
-**Use Lovable**
+- **Structured Data Capture**  
+  - Detailed patient intake covers demographics, optometry, medical history, surgeries, medications, allergies, and more.
+  - Smart autocomplete suggest lists for long datasets, with support for “Other” (free-text), “+ Add Another”, and “None / Not Applicable” logic.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/42a3dfff-942d-44e2-8377-b14d4b12aeb5) and start prompting.
+- **UI/UX Design**  
+  - Field-level icons (person, phone, calendar) for intuitive input.
+  - Clean layout with minimum 16px vertical spacing.
+  - Robust input validation (e.g., phone number restricted to exactly 10 digits).
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Automated Workflow**  
+  - On submission, data is stored in the `patient_registrations` table in Supabase.
+  - A Supabase Edge Function (`generate_patient_pdf`) is triggered to generate a professionally formatted PDF.
+  - The PDF is emailed to the institute via SendGrid—completing the intake process seamlessly.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🔒 HIPAA & Privacy Considerations
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+This prototype is built with **privacy-aware practices**, though it's not production-ready:
 
-Follow these steps:
+- All communications should use **HTTPS** to encrypt data in transit.
+- Stores data in Supabase securely—but no sensitive logging or unauthorized access.
+- Implement **Row-Level Security (RLS)** and Supabase authentication before any production roll-out.
+- Use **data minimization**—only collect what’s necessary, and clearly label optional free-text inputs.
+  
+> ⚠ **Disclaimer**: This app is for demonstration only. For clinical use, you must perform a full HIPAA audit and compliance review prior to deployment.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 📸 Screenshots
 
-# Step 3: Install the necessary dependencies.
-npm i
+| Patient Info Form | Autocomplete Inputs |
+|-------------------|---------------------|
+| ![Form View](screenshot.1.png) | ![Field Selection](screenshot.2.png) |
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+| Review & Submit | Generated PDF Workflow |
+|-----------------|------------------------|
+| ![Field Selection](screenshot.3.png) | ![PDF Summary](screenshot.4.png) |
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🛠 Tech Stack
 
-**Use GitHub Codespaces**
+- **Frontend**: Lovable
+- **Backend**: Supabase (PostgreSQL database + Edge Functions)  
+- **Email Delivery**: SendGrid integrated via Edge Function
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/42a3dfff-942d-44e2-8377-b14d4b12aeb5) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+📄 License
+This project is licensed under the MIT License – see the LICENSE file for details.
