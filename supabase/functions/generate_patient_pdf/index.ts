@@ -296,6 +296,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('SendGrid API key not configured. Please set SENDGRID_API_KEY in Supabase secrets.');
     }
 
+    const FROM_EMAIL = Deno.env.get('SENDGRID_FROM_EMAIL');
+    const FROM_NAME = Deno.env.get('SENDGRID_FROM_NAME') || 'Imaginary Eye Institute';
+    if (!FROM_EMAIL) {
+      throw new Error('SendGrid from email not configured. Please set SENDGRID_FROM_EMAIL to a verified sender in SendGrid.');
+    }
+
     const emailBody = {
       personalizations: [
         {
@@ -304,9 +310,10 @@ const handler = async (req: Request): Promise<Response> => {
         }
       ],
       from: { 
-        email: "kartaitesting@gmail.com", 
-        name: "Imaginary Eye Institute" 
+        email: FROM_EMAIL, 
+        name: FROM_NAME 
       },
+      reply_to: patientData.email ? { email: patientData.email } : undefined,
       content: [
         {
           type: "text/html",
