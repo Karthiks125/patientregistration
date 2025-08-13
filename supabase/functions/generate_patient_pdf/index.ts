@@ -291,15 +291,15 @@ const handler = async (req: Request): Promise<Response> => {
     const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
     
     // Send email using SendGrid
-    const SENDGRID_API_KEY = Deno.env.get('SENDGRID_FORM_KEY');
+    const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY');
     if (!SENDGRID_API_KEY) {
-      throw new Error('SendGrid API key not configured');
+      throw new Error('SendGrid API key not configured. Please set SENDGRID_API_KEY in Supabase secrets.');
     }
 
     const emailBody = {
       personalizations: [
         {
-          to: [{ email: 'kartaitesting@gmail.com' }],
+          to: [{ email: emailTo }],
           subject: `Patient Registration Summary - ${patientData.firstName} ${patientData.lastName}`
         }
       ],
