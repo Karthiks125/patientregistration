@@ -330,20 +330,31 @@ const handler = async (req: Request): Promise<Response> => {
       ]
     };
 
-    const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${SENDGRID_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(emailBody)
-    });
+    // Robust send with retries for transient errors
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const sendEmail = async (attempt: number = 1): Promise<Response> => {
+      const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SENDGRID_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(emailBody)
+      });
 
-    if (!emailResponse.ok) {
-      const errorText = await emailResponse.text();
-      console.error('SendGrid error:', errorText);
-      throw new Error(`Failed to send email: ${emailResponse.statusText}`);
-    }
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`SendGrid error (attempt ${attempt}):`, errorText);
+        if ((res.status === 429 || res.status >= 500) && attempt < 3) {
+          await wait(500 * attempt); // exponential backoff
+          return sendEmail(attempt + 1);
+        }
+        throw new Error(`Failed to send email: ${res.status} ${res.statusText}`);
+      }
+      return res;
+    };
+
+    await sendEmail();
 
     console.log('Email sent successfully to:', emailTo);
 
