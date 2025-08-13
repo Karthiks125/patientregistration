@@ -24,9 +24,9 @@ const Index = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-50 text-white text-center">
         <div className="text-6xl mb-4">✅</div>
-        <div className="text-3xl mb-4 font-bold">Registration Completed Successfully!</div>
+        <div className="text-3xl mb-4 font-bold">We have received all your details</div>
         <div className="text-xl max-w-2xl px-4">
-          Your medical intake form has been received and a confirmation has been sent to your email.
+          They have been successfully added to your file. You’ll be redirected shortly.
         </div>
       </div>
     );

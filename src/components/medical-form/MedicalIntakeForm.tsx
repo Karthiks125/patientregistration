@@ -235,11 +235,9 @@ export const MedicalIntakeForm: React.FC = () => {
           description: "However, there was an issue sending the confirmation email. Please contact us if you need a copy.",
           variant: "default"
         });
-      } else {
-        console.log('PDF generated and email sent:', pdfResponse);
-        // Show full screen success message and redirect after 7 seconds
-        window.location.href = '/?success=true';
       }
+      // Show full screen success message and redirect after 7 seconds
+      window.location.href = '/?success=true';
 
       // Reset form
       setFormData({
